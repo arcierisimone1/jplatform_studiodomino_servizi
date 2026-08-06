@@ -88,33 +88,23 @@
 
         <div id="header-sticky" class="it-header-area it-header-ptb p-relative">
             <div class="container">
-                <!-- Riga unica: logo + menu + ricerca (solo icona, si apre al click) + CTA,
-                     come nell'header originale del sito, con le 6 nuove voci di menu. -->
                 <div class="row align-items-center flex-nowrap">
                     <div class="col-auto">
                         <div class="it-header-logo">
-                            <!-- Il file logo_principale.png è ad alta risoluzione: senza una
-                                 larghezza massima esplicita, in una colonna "col-auto" (che si
-                                 adatta al contenuto) veniva mostrato a piena grandezza nativa. -->
-                            <a th:href="@{/}"><img th:src="@{/site01/images/logo_principale.png}" alt="Studiodomino Formazione" style="max-width:220px; width:100%; height:auto;"/></a>
+                            <a th:href="@{/}"><img th:src="@{/site01/images/logo.png}" alt="Studiodomino Formazione" style="max-width:220px; width:100%; height:auto;"/></a>
                         </div>
                     </div>
                     <div class="col d-none d-xl-block">
                         <div class="it-header-menu it-header-dropdown">
                             <style>
-                                /* Su una sola riga insieme a logo, ricerca e CTA, 6 voci di menu
-                                   (con "Orientamento Professionale" piuttosto lungo) hanno bisogno
-                                   di margini e font più stretti dei 19px/16px di default del tema. */
-                                .it-header-dropdown .it-nav-menu { display: flex; flex-wrap: nowrap; justify-content: flex-end; padding-left: 0; }
-                                .it-header-dropdown .it-nav-menu > li { margin: 0 9px; }
-                                .it-header-dropdown .it-nav-menu > li > a { white-space: nowrap; font-size: 14px; }
-                                .it-search-expand { display: none; }
-                                .it-search-expand.is-open { display: block !important; }
+                                .it-header-dropdown .it-nav-menu { display: flex; flex-wrap: nowrap; justify-content: center; padding-left: 30px; margin-right: -40px; }
+                                .it-header-dropdown .it-nav-menu > li { margin: 0 12px; }
+                                .it-header-dropdown .it-nav-menu > li > a { white-space: nowrap; font-size: 16px; }
                             </style>
                             <nav class="it-menu-content">
                                 <ul class="it-nav-menu" th:if="${config != null and config.sezioniFront != null}">
 
-                                    <th:block th:each="sezione : ${config.sezioniFront}">
+                                    <th:block th:each="sezione : ${config.sezioniFront}" th:if="${sezione.id == null or sezione.id != 370}">
 
                                         <!-- MENU1=1: voce semplice, solo link -->
                                         <li class="menu-item" th:if="${sezione.menu1.toString() == '1'}">
@@ -249,17 +239,13 @@
                     <div class="col-auto">
                         <div class="d-flex align-items-center" style="gap:10px;">
 
-                            <!-- Ricerca: solo lente, il campo si apre al click -->
-                            <div class="p-relative">
-                                <button type="button" aria-label="Cerca" style="background:none;border:none;padding:6px;cursor:pointer;line-height:0;font-size:16px;color:#6C757D;"
-                                        onclick="var f=this.nextElementSibling; f.classList.toggle('is-open'); if(f.classList.contains('is-open')){ f.querySelector('input').focus(); }">
-                                    <i class="fa-light fa-magnifying-glass"></i>
-                                </button>
-                                <form th:action="@{/ricerca}" method="get" class="it-search-expand"
-                                      style="position:absolute; right:0; top:100%; margin-top:10px; background:#fff; box-shadow:0 15px 30px rgba(0,0,0,.12); border-radius:10px; padding:10px; z-index:20;">
-                                    <input type="text" name="campo1" placeholder="Cerca..." style="border:1px solid rgba(0,0,0,.1); border-radius:6px; padding:8px 12px; width:220px;"/>
-                                </form>
-                            </div>
+                            <!-- Ricerca: box tema Educeet, sempre visibile -->
+                            <form th:action="@{/ricerca}" method="get" class="it-header-search-wrap d-none d-lg-flex align-items-center">
+                                <div class="it-header-search" style="border-left:none; max-width:230px;">
+                                    <input type="text" name="campo1" placeholder="Cerca nel sito.."/>
+                                    <span class="icon"><i class="fa-light fa-magnifying-glass"></i></span>
+                                </div>
+                            </form>
 
                             <a th:href="@{/front/370/Contatti}" class="it-btn-yellow d-none d-md-flex">
               <span>

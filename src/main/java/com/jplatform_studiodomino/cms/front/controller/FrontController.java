@@ -84,13 +84,6 @@ public class FrontController {
                 config, request, response, session, model);
     }
 
-    // =====================================================================
-    // ENTRY POINT SEO  /front/{pid}/**
-    //
-    // Un solo mapping che cattura tutto — nessun conflitto con le risorse statiche
-    // perché /{pid}/** è più specifico di /**
-    // =====================================================================
-
     @GetMapping("/{pid}/**")
     public String dispatchSeo(
             @PathVariable String pid,
@@ -303,12 +296,12 @@ public class FrontController {
             model.addAttribute("section", section);
             model.addAttribute("contents", section.getContenuti());
 
-            // ===== TEAM AZIENDALE (solo per la sezione "L'azienda", id 313) =====
+            // ===== TEAM AZIENDALE (solo per la sezione "L'azienda", id 312) =====
             // Mostra gli Amministratori del gestionale come "il nostro team",
             // riusando gli stessi dati/foto già gestiti in /admin/amministratori.
-            // NB: era id 312 finché la sezione "L'azienda" non è stata fusa con
-            // "Sede" e ha preso l'id 313 di quest'ultima.
-            if (section.getId() != null && section.getId() == 313) {
+            // NB: id diverso da quello del sito Formazione (dove "L'azienda" è 313
+            // dopo la fusione con "Sede") perché qui è un database CMS separato.
+            if (section.getId() != null && section.getId() == 312) {
                 try {
                     List<Utente> team = utenteService.getAllUtenti().stream()
                             .sorted((a, b) -> {
@@ -466,10 +459,18 @@ public class FrontController {
      * Il risultato atteso viene salvato in sessione e verificato da ContattoController.
      */
     private void generateCaptcha(HttpSession session, Model model) {
-        java.util.Random random = new java.util.Random();
-        int a = 1 + random.nextInt(9);
-        int b = 1 + random.nextInt(9);
-        session.setAttribute("captchaSum", a + b);
+
+        Integer a = (Integer) session.getAttribute("captchaA");
+        Integer b = (Integer) session.getAttribute("captchaB");
+        Object sum = session.getAttribute("captchaSum");
+        if (a == null || b == null || sum == null) {
+            java.util.Random random = new java.util.Random();
+            a = 1 + random.nextInt(9);
+            b = 1 + random.nextInt(9);
+            session.setAttribute("captchaSum", a + b);
+            session.setAttribute("captchaA", a);
+            session.setAttribute("captchaB", b);
+        }
         model.addAttribute("captchaA", a);
         model.addAttribute("captchaB", b);
     }

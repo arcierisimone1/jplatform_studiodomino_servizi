@@ -1,0 +1,97 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="homeTiles_10">
+    <section class="it-categories-area pt-80 pb-95">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="it-categories-section-title-box text-center mb-50">
+                        <span class="it-section-subtitle">Servizi rapidi</span>
+                        <h4 class="it-section-title">Hai bisogno di <span class="z-index-1">assistenza?</span></h4>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .it-quick-service-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    background: #fff;
+                    border-radius: 20px;
+                    padding: 35px 20px;
+                    box-shadow: 0 15px 30px rgba(1, 6, 20, 0.06);
+                    transition: transform .25s ease, box-shadow .25s ease;
+                    height: 100%;
+                    width: 100%;
+                }
+                .it-quick-service-item:hover {
+                    transform: translateY(-6px);
+                    box-shadow: 0 20px 40px rgba(1, 6, 20, 0.12);
+                }
+                .it-quick-service-icon {
+                    width: 64px;
+                    height: 64px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: var(--it-theme-1);
+                    color: #fff;
+                    font-size: 26px;
+                    margin-bottom: 18px;
+                    flex-shrink: 0;
+                }
+                .it-quick-service-item h6 {
+                    margin: 0;
+                    color: var(--it-heading-primary);
+                }
+            </style>
+
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 gx-25 gy-25">
+
+                <div class="col d-flex">
+                    <a th:href="@{/front/319/Assistenza_hardware_e_software}" class="it-quick-service-item text-decoration-none">
+                        <span class="it-quick-service-icon"><i class="fa-solid fa-headset"></i></span>
+                        <h6>Assistenza Tecnica</h6>
+                    </a>
+                </div>
+
+                <div class="col d-flex">
+                    <a href="#" class="it-quick-service-item text-decoration-none">
+                        <span class="it-quick-service-icon"><i class="fa-solid fa-bullhorn"></i></span>
+                        <h6>Media Manager</h6>
+                    </a>
+                </div>
+
+                <div class="col d-flex">
+                    <a th:href="@{/front/318/Lo_sviluppo_software}" class="it-quick-service-item text-decoration-none">
+                        <span class="it-quick-service-icon"><i class="fa-solid fa-laptop-code"></i></span>
+                        <h6>Sviluppo Software</h6>
+                    </a>
+                </div>
+
+                <div class="col d-flex">
+                    <a th:href="@{/front/718/Firma_Digitale}" class="it-quick-service-item text-decoration-none">
+                        <span class="it-quick-service-icon"><i class="fa-solid fa-file-signature"></i></span>
+                        <h6>Firma Digitale</h6>
+                    </a>
+                </div>
+
+                <div class="col d-flex">
+                    <a th:href="@{/front/719/SPID_-_Sistema_Pubblico_di_Identità_Digitale}" class="it-quick-service-item text-decoration-none">
+                        <span class="it-quick-service-icon"><i class="fa-solid fa-id-card"></i></span>
+                        <h6>SPID</h6>
+                    </a>
+                </div>
+
+                <div class="col d-flex">
+                    <a th:href="@{/front/393/Aruba_PEC}" class="it-quick-service-item text-decoration-none">
+                        <span class="it-quick-service-icon"><i class="fa-solid fa-envelope-open-text"></i></span>
+                        <h6>PEC</h6>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</th:block>
