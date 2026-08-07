@@ -197,6 +197,10 @@ public class FrontController {
             if (contentBase == null) {
                 log.warn("Contenuto non trovato per pid: {}", pid);
                 model.addAttribute("config", config);
+                // Contenuto realmente inesistente: niente soft-404. Lo status deve essere 404
+                // anche se la vista mostrata resta la home, altrimenti Google indicizza pagine
+                // rimosse/inesistenti come se fossero valide (200 OK).
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return resolveTemplate(config, "homePortal");
             }
 
@@ -211,6 +215,7 @@ public class FrontController {
                     || !dispatchService.isInPeriodoPubblicazione(contentBase)) {
                 log.warn("Contenuto non accessibile: pid={}", pid);
                 model.addAttribute("config", config);
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return resolveTemplate(config, "homePortal");
             }
 

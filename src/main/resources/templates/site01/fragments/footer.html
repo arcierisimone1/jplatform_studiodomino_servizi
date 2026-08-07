@@ -71,7 +71,7 @@
                         <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-50">
                             <div class="it-footer-widget it-footer-col-1-1">
                                 <div class="it-footer-widget-logo mb-30">
-                                    <a th:href="@{/}"><img th:src="@{site01/images/logo_principale.png}" alt="Studiodomino Formazione"/></a>
+                                    <a th:href="@{/}"><img th:src="@{site01/images/logo.png}" alt="Studiodomino Formazione"/></a>
                                 </div>
                                 <div class="it-footer-widget-btn">
                                     <a th:href="@{/front/370/Contatti}" class="it-btn-yellow theme-bg">
@@ -89,33 +89,18 @@
                             </div>
                         </div>
 
-                        <!-- Colonna 2: Sicurezza e Privacy (sezioniFront menu1==5, 3 livelli) -->
+                        <!-- Colonna 2: Sicurezza e Privacy (link diretti sugli ID reali: niente piu' dipendenza dal tag CMS menu1==5,
+                             che si perde ogni volta che la sezione viene risalvata dal pannello admin) -->
                         <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-50">
                             <div class="it-footer-widget it-footer-col-1-2">
                                 <h4 class="it-footer-widget-title">Sicurezza e Privacy</h4>
                                 <div class="it-footer-widget-menu">
                                     <ul>
-                                        <th:block th:if="${config != null and config.sezioniFront != null}">
-                                            <th:block th:each="sezione : ${config.sezioniFront}">
-                                                <li th:if="${sezione.menu1 == '5' and sezione.menu2 == '0'}">
-                                                    <a th:href="@{'/' + ${sezione.url}}" th:text="${sezione.titolo}">Titolo</a>
-                                                </li>
-                                                <th:block th:if="${sezione.emptySubsection == false}">
-                                                    <th:block th:each="sezione2 : ${sezione.subsection}">
-                                                        <li th:if="${sezione2.menu1 == '5' and sezione2.menu2 == '0'}">
-                                                            <a th:href="@{'/' + ${sezione2.url}}" th:text="${sezione2.titolo}">Titolo</a>
-                                                        </li>
-                                                        <th:block th:if="${sezione2.emptySubsection == false}">
-                                                            <th:block th:each="sezione3 : ${sezione2.subsection}">
-                                                                <li th:if="${sezione3.menu1 == '5' and sezione3.menu2 == '0'}">
-                                                                    <a th:href="@{'/' + ${sezione3.url}}" th:text="${sezione3.titolo}">Titolo</a>
-                                                                </li>
-                                                            </th:block>
-                                                        </th:block>
-                                                    </th:block>
-                                                </th:block>
-                                            </th:block>
-                                        </th:block>
+                                        <li><a th:href="@{/front/34/Cookie-Policy}">Cookie Policy</a></li>
+                                        <li><a th:href="@{/front/35/Privacy_Policy}">Privacy Policy</a></li>
+                                        <li><a th:href="@{/front/33/Note_legali}">Note legali</a></li>
+                                        <li><a th:href="@{/front/327/Accessibilita}">Accessibilità</a></li>
+                                        <li><a th:href="@{/front/701/Statistiche_Web}">Statistiche Web</a></li>
                                     </ul>
                                 </div>
                             </div>

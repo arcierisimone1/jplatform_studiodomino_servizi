@@ -18,6 +18,7 @@
 <th:block th:replace="~{site01/fragments/side-panel}"></th:block>
 
 <main layout:fragment="content">
+    <h1 class="sr-only" th:text="${config != null and config.sito != null ? config.sito.type + (config.sito.descrizione != null and !config.sito.descrizione.isEmpty() ? ' - ' + config.sito.descrizione : '') : 'Home'}">Home</h1>
     <th:block th:replace="~{site01/fragments/home_tiles/homeTiles_00 :: homeTiles_00}"></th:block>
     <th:block th:replace="~{site01/fragments/home_tiles/homeTiles_01 :: homeTiles_01}"></th:block>
     <!--th:block th:replace="~{site01/fragments/home_tiles/homeTiles_02 :: homeTiles_02}"></th:block-->
