@@ -47,7 +47,7 @@
             <div class="row gx-25">
                 <div class="col-xxl-2 col-xl-3 col-lg-3 col-md-4 col-sm-6" th:each="admin : ${team}">
                     <div class="it-team-item text-center p-relative mb-35">
-                        <div class="it-team-content-box">
+                        <div class="it-team-content-box" style="height:140px; overflow:hidden;">
                             <div class="it-team-content">
                                 <h4 class="it-team-title" th:text="${admin.nome + ' ' + admin.cognome}">Nome Cognome</h4>
                                 <span th:if="${admin.incarico != null and !admin.incarico.isEmpty()}" th:text="${admin.incarico}">Ruolo</span>

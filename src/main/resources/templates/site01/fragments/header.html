@@ -2,10 +2,10 @@
 
     <header class="it-header-height">
 
-        <div class="it-header-top-area black-bg it-header-top-ptb">
+        <div class="it-header-top-area black-bg it-header-top-ptb" style="position:relative;">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-xl-8 col-lg-8 col-md-7 col-sm-6">
+                    <div class="col-auto">
                         <style>
                             .it-header-top-contact-wrap {
                                 flex-wrap: nowrap;
@@ -52,20 +52,30 @@
                                 </li>
                                 <li>
                                     <div class="it-header-top-contact d-flex align-items-center">
-                  <span>
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M14.25 0.75H3.75C2.7558 0.751191 1.80267 1.14666 1.09966 1.84966C0.396661 2.55267 0.00119089 3.5058 0 4.5L0 13.5C0.00119089 14.4942 0.396661 15.4473 1.09966 16.1503C1.80267 16.8533 2.7558 17.2488 3.75 17.25H14.25C15.2442 17.2488 16.1973 16.8533 16.9003 16.1503C17.6033 15.4473 17.9988 14.4942 18 13.5V4.5C17.9988 3.5058 17.6033 2.55267 16.9003 1.84966C16.1973 1.14666 15.2442 0.751191 14.25 0.75ZM3.75 2.25H14.25C14.6991 2.25088 15.1376 2.38614 15.5092 2.63835C15.8808 2.89057 16.1684 3.24821 16.335 3.66525L10.5915 9.4095C10.1688 9.83049 9.59656 10.0669 9 10.0669C8.40344 10.0669 7.83118 9.83049 7.4085 9.4095L1.665 3.66525C1.83161 3.24821 2.11921 2.89057 2.49079 2.63835C2.86236 2.38614 3.30091 2.25088 3.75 2.25ZM14.25 15.75H3.75C3.15326 15.75 2.58097 15.5129 2.15901 15.091C1.73705 14.669 1.5 14.0967 1.5 13.5V5.625L6.348 10.47C7.05197 11.1722 8.00569 11.5665 9 11.5665C9.99431 11.5665 10.948 11.1722 11.652 10.47L16.5 5.625V13.5C16.5 14.0967 16.2629 14.669 15.841 15.091C15.419 15.5129 14.8467 15.75 14.25 15.75Z" fill="#F8C62F"/>
-                    </svg>
-                  </span>
+                            <span>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.25 0.75H3.75C2.7558 0.751191 1.80267 1.14666 1.09966 1.84966C0.396661 2.55267 0.00119089 3.5058 0 4.5L0 13.5C0.00119089 14.4942 0.396661 15.4473 1.09966 16.1503C1.80267 16.8533 2.7558 17.2488 3.75 17.25H14.25C15.2442 17.2488 16.1973 16.8533 16.9003 16.1503C17.6033 15.4473 17.9988 14.4942 18 13.5V4.5C17.9988 3.5058 17.6033 2.55267 16.9003 1.84966C16.1973 1.14666 15.2442 0.751191 14.25 0.75ZM3.75 2.25H14.25C14.6991 2.25088 15.1376 2.38614 15.5092 2.63835C15.8808 2.89057 16.1684 3.24821 16.335 3.66525L10.5915 9.4095C10.1688 9.83049 9.59656 10.0669 9 10.0669C8.40344 10.0669 7.83118 9.83049 7.4085 9.4095L1.665 3.66525C1.83161 3.24821 2.11921 2.89057 2.49079 2.63835C2.86236 2.38614 3.30091 2.25088 3.75 2.25ZM14.25 15.75H3.75C3.15326 15.75 2.58097 15.5129 2.15901 15.091C1.73705 14.669 1.5 14.0967 1.5 13.5V5.625L6.348 10.47C7.05197 11.1722 8.00569 11.5665 9 11.5665C9.99431 11.5665 10.948 11.1722 11.652 10.47L16.5 5.625V13.5C16.5 14.0967 16.2629 14.669 15.841 15.091C15.419 15.5129 14.8467 15.75 14.25 15.75Z" fill="#F8C62F"/>
+            </svg>
+          </span>
                                         <a class="border-line" href="mailto:info@studiodominoweb.com">info@studiodominoweb.com</a>
                                     </div>
                                 </li>
                             </ul>
+                            <div class="p-relative d-none d-xl-flex ms-auto" th:with="seo=${seo != null ? seo : @seoService.fallback()}" style="flex-shrink:0; position:relative; z-index:20;">
+                                <button type="button" aria-label="Condividi" style="background:none;border:none;padding:6px;cursor:pointer;line-height:0;color:#fff;font-size:16px;"
+                                        onclick="var f=this.nextElementSibling; f.classList.toggle('is-open');">
+                                    <i class="fa-light fa-share-alt"></i>
+                                </button>
+                                <div class="it-search-expand"
+                                     style="position:absolute; right:0; top:100%; margin-top:10px; background:#fff; box-shadow:0 15px 30px rgba(0,0,0,.12); border-radius:10px; padding:14px; z-index:1000;">
+                                    <th:block th:replace="~{site01/fragments/head_social_home :: shareBar(${seo.canonicalUrl}, ${seo.title})}"></th:block>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-xl-4 col-lg-4 col-md-5 col-sm-6 d-none d-sm-block">
-                        <div class="it-header-top-right-action d-flex align-items-center justify-content-end">
-                            <div class="it-header-top-social-box align-items-center d-flex">
+                    <div class="col-auto d-none d-sm-block">
+                        <div class="it-header-top-right-action d-flex align-items-center">
+                            <div class="it-header-top-social-box align-items-center d-flex" style="gap:8px;">
                                 <span>Seguici su:</span>
                                 <a href="https://www.facebook.com/studiodominoaltaformazione" aria-label="Facebook">
                                     <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -100,6 +110,8 @@
                                 .it-header-dropdown .it-nav-menu { display: flex; flex-wrap: nowrap; justify-content: center; padding-left: 30px; margin-right: -40px; }
                                 .it-header-dropdown .it-nav-menu > li { margin: 0 12px; }
                                 .it-header-dropdown .it-nav-menu > li > a { white-space: nowrap; font-size: 16px; }
+                                .it-search-expand { display: none; }
+                                .it-search-expand.is-open { display: block !important; }
                             </style>
                             <nav class="it-menu-content">
                                 <ul class="it-nav-menu" th:if="${config != null and config.sezioniFront != null}">
@@ -239,13 +251,17 @@
                     <div class="col-auto">
                         <div class="d-flex align-items-center" style="gap:10px;">
 
-                            <!-- Ricerca: box tema Educeet, sempre visibile -->
-                            <form th:action="@{/ricerca}" method="get" class="it-header-search-wrap d-none d-lg-flex align-items-center">
-                                <div class="it-header-search" style="border-left:none; max-width:230px;">
-                                    <input type="text" name="campo1" placeholder="Cerca nel sito.."/>
-                                    <span class="icon"><i class="fa-light fa-magnifying-glass"></i></span>
-                                </div>
-                            </form>
+                            <!-- Ricerca: solo lente, il campo si apre al click -->
+                            <div class="p-relative">
+                                <button type="button" aria-label="Cerca" style="background:none;border:none;padding:6px;cursor:pointer;line-height:0;font-size:16px;color:#6C757D;"
+                                        onclick="var f=this.nextElementSibling; f.classList.toggle('is-open'); if(f.classList.contains('is-open')){ f.querySelector('input').focus(); }">
+                                    <i class="fa-light fa-magnifying-glass"></i>
+                                </button>
+                                <form th:action="@{/ricerca}" method="get" class="it-search-expand"
+                                      style="position:absolute; right:0; top:100%; margin-top:10px; background:#fff; box-shadow:0 15px 30px rgba(0,0,0,.12); border-radius:10px; padding:10px; z-index:20;">
+                                    <input type="text" name="campo1" placeholder="Cerca..." style="border:1px solid rgba(0,0,0,.1); border-radius:6px; padding:8px 12px; width:220px;"/>
+                                </form>
+                            </div>
 
                             <a th:href="@{/front/370/Contatti}" class="it-btn-yellow d-none d-md-flex">
               <span>
@@ -289,6 +305,27 @@
                 </p>
             </div>
             <div class="it-menu-mobile d-xl-none">
+                <style>
+                    .it-menu-mobile li .dropdown-toggle-btn {
+                        position: absolute;
+                        right: 0;
+                        top: 8px;
+                        width: 32px;
+                        height: 32px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: none;
+                        border: 1px solid rgba(0,0,0,.15);
+                        border-radius: 4px;
+                        cursor: pointer;
+                        padding: 0;
+                        z-index: 1;
+                    }
+                    .it-menu-mobile li .dropdown-toggle-btn i { transition: transform .2s ease-in-out; }
+                    .it-menu-mobile li .dropdown-toggle-btn.dropdown-opened i { transform: rotate(45deg); }
+                    .it-menu-mobile ul.submenu.dropdown-opened { display: block !important; }
+                </style>
                 <ul class="it-nav-menu" th:if="${config != null and config.sezioniFront != null}">
 
                     <th:block th:each="sezione : ${config.sezioniFront}">
@@ -305,6 +342,10 @@
                             <a th:if="${sezione.menu2.toString() == '0'}" th:href="@{'/' + ${sezione.url}}" th:text="${sezione.titolo}">Titolo</a>
                             <a th:if="${sezione.menu2.toString() == '1'}" href="javascript:void(0)" th:text="${sezione.titolo}">Titolo</a>
                             <a th:if="${sezione.menu2.toString() == '2'}" th:href="${sezione.menu3}" target="_blank" th:text="${sezione.menu4}">Titolo</a>
+                            <button type="button" class="dropdown-toggle-btn" aria-label="Espandi sottomenu"
+                                    th:if="${sezione.subsection != null and !sezione.emptySubsection}">
+                                <i class="fal fa-plus"></i>
+                            </button>
 
                             <ul class="it-submenu submenu" th:if="${sezione.subsection != null and !sezione.emptySubsection}">
                                 <th:block th:each="sezione2 : ${sezione.subsection}" th:if="${sezione2.menu1.toString() != '0'}">
@@ -312,6 +353,10 @@
                                         <a th:if="${sezione2.menu2.toString() == '0'}" th:href="@{'/' + ${sezione2.url}}" th:text="${sezione2.titolo}">Sottosezione</a>
                                         <a th:if="${sezione2.menu2.toString() == '1'}" href="javascript:void(0)" th:text="${sezione2.titolo}">Sottosezione</a>
                                         <a th:if="${sezione2.menu2.toString() == '2'}" th:href="${sezione2.menu3}" target="_blank" th:text="${sezione2.menu4}">Sottosezione</a>
+                                        <button type="button" class="dropdown-toggle-btn" aria-label="Espandi sottomenu"
+                                                th:if="${sezione2.subsection != null and !sezione2.emptySubsection}">
+                                            <i class="fal fa-plus"></i>
+                                        </button>
 
                                         <ul class="it-submenu submenu" th:if="${sezione2.subsection != null and !sezione2.emptySubsection}">
                                             <th:block th:each="sezione3 : ${sezione2.subsection}" th:if="${sezione3.menu1.toString() != '0'}">
@@ -319,6 +364,10 @@
                                                     <a th:if="${sezione3.menu2.toString() == '0'}" th:href="@{'/' + ${sezione3.url}}" th:text="${sezione3.titolo}">Sottosezione</a>
                                                     <a th:if="${sezione3.menu2.toString() == '1'}" href="javascript:void(0)" th:text="${sezione3.titolo}">Sottosezione</a>
                                                     <a th:if="${sezione3.menu2.toString() == '2'}" th:href="${sezione3.menu3}" target="_blank" th:text="${sezione3.menu4}">Sottosezione</a>
+                                                    <button type="button" class="dropdown-toggle-btn" aria-label="Espandi sottomenu"
+                                                            th:if="${sezione3.subsection != null and !sezione3.emptySubsection}">
+                                                        <i class="fal fa-plus"></i>
+                                                    </button>
 
                                                     <ul class="it-submenu submenu" th:if="${sezione3.subsection != null and !sezione3.emptySubsection}">
                                                         <th:block th:each="sezione4 : ${sezione3.subsection}" th:if="${sezione4.menu1.toString() != '0'}">
@@ -342,6 +391,10 @@
                             <a th:if="${sezione.menu2.toString() == '0'}" th:href="@{'/' + ${sezione.url}}" th:text="${sezione.titolo}">Titolo</a>
                             <a th:if="${sezione.menu2.toString() == '1'}" href="javascript:void(0)" th:text="${sezione.titolo}">Titolo</a>
                             <a th:if="${sezione.menu2.toString() == '2'}" th:href="${sezione.menu3}" target="_blank" th:text="${sezione.menu4}">Titolo</a>
+                            <button type="button" class="dropdown-toggle-btn" aria-label="Espandi sottomenu"
+                                    th:if="${sezione.subsection != null and !sezione.emptySubsection}">
+                                <i class="fal fa-plus"></i>
+                            </button>
 
                             <ul class="it-submenu submenu" th:if="${sezione.subsection != null and !sezione.emptySubsection}">
                                 <th:block th:each="sezione2 : ${sezione.subsection}" th:if="${sezione2.menu1.toString() == '3'}">
@@ -365,6 +418,10 @@
                             <a th:if="${sezione.menu2.toString() == '0'}" th:href="@{'/' + ${sezione.url}}" th:text="${sezione.titolo}">Titolo</a>
                             <a th:if="${sezione.menu2.toString() == '1'}" href="javascript:void(0)" th:text="${sezione.titolo}">Titolo</a>
                             <a th:if="${sezione.menu2.toString() == '2'}" th:href="${sezione.menu3}" target="_blank" th:text="${sezione.menu4}">Titolo</a>
+                            <button type="button" class="dropdown-toggle-btn" aria-label="Espandi sottomenu"
+                                    th:if="${sezione.subsection != null and !sezione.emptySubsection}">
+                                <i class="fal fa-plus"></i>
+                            </button>
 
                             <ul class="it-submenu submenu" th:if="${sezione.subsection != null and !sezione.emptySubsection}">
                                 <th:block th:each="sezione2 : ${sezione.subsection}" th:if="${sezione2.menu1.toString() != '0'}">
@@ -384,24 +441,6 @@
                 </ul>
             </div>
 
-            <!-- Calendario corsi in partenza (dal vecchio side-panel.jsp, riscritto con classi Educeet) -->
-            <div class="itoffcanvas__blog" th:if="${config != null and config.contenutiFront05 != null}">
-                <h3 class="offcanva-title">Corsi in Partenza</h3>
-                <th:block th:each="articolo : ${config.contenutiFront05}">
-                    <div class="itoffcanvas__blog-item d-flex align-items-center mb-15">
-                        <div class="itoffcanvas__blog-thumb me-3">
-                            <a th:href="@{'/' + ${articolo.url}}">
-                                <img th:src="${config.imagesRepositoryWeb + articolo.logo}" th:alt="${articolo.titolo}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;"/>
-                            </a>
-                        </div>
-                        <div class="itoffcanvas__blog-content">
-                            <span class="d-block small text-muted" th:text="${articolo.dataVisualizzata}">Data</span>
-                            <a th:href="@{'/' + ${articolo.url}}" th:text="${articolo.titolo}">Titolo corso</a>
-                        </div>
-                    </div>
-                </th:block>
-            </div>
-
             <div class="itoffcanvas__info">
                 <h3 class="offcanva-title">Contattaci</h3>
                 <div class="it-info-wrapper mb-20 d-flex align-items-center">
@@ -414,7 +453,7 @@
                 <div class="it-info-wrapper mb-20 d-flex align-items-center">
                     <div class="itoffcanvas__info-icon"><a href="tel:0971445096"><i class="fal fa-phone-alt"></i></a></div>
                     <div class="itoffcanvas__info-address">
-                        <span>Telefono</span>
+
                         <li><span>Telefono:</span><a href="tel:0971445096">0971 445096</a><a href="tel:366 6844615">366 6844615</a></li>
                     </div>
                 </div>
@@ -443,6 +482,26 @@
           if (openBtn) openBtn.addEventListener('click', openMenu);
           if (closeBtn) closeBtn.addEventListener('click', closeMenu);
           if (overlay) overlay.addEventListener('click', closeMenu);
+
+                // Sottomenu del menu mobile: serve un click per aprirli (su telefono non c'è l'hover del desktop).
+      if (panel) {
+        panel.addEventListener('click', function (e) {
+          var btn = e.target.closest('.dropdown-toggle-btn');
+          if (!btn) return;
+          e.preventDefault();
+          e.stopPropagation();
+          var li = btn.closest('li');
+          if (!li) return;
+          var submenu = null;
+          for (var i = 0; i < li.children.length; i++) {
+            if (li.children[i].classList.contains('submenu')) { submenu = li.children[i]; break; }
+          }
+          if (!submenu) return;
+          var isOpen = submenu.classList.contains('dropdown-opened');
+          submenu.classList.toggle('dropdown-opened', !isOpen);
+          btn.classList.toggle('dropdown-opened', !isOpen);
+        });
+      }
 
           var headerArea = document.getElementById('header-sticky');
           if (headerArea) {

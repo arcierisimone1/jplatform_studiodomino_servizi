@@ -453,30 +453,6 @@ public class Content {
     private String varchar10;
 
     // ========================================
-    // CAMPI LONGBLOB (1-5)
-    // ========================================
-
-    @Lob
-    @Column(name = "longblob1", columnDefinition = "LONGBLOB")
-    private byte[] longblob1;
-
-    @Lob
-    @Column(name = "longblob2", columnDefinition = "LONGBLOB")
-    private byte[] longblob2;
-
-    @Lob
-    @Column(name = "longblob3", columnDefinition = "LONGBLOB")
-    private byte[] longblob3;
-
-    @Lob
-    @Column(name = "longblob4", columnDefinition = "LONGBLOB")
-    private byte[] longblob4;
-
-    @Lob
-    @Column(name = "longblob5", columnDefinition = "LONGBLOB")
-    private byte[] longblob5;
-
-    // ========================================
     // CAMPI ARRAY (1-5) - TEXT nel DB
     // ========================================
 

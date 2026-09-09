@@ -381,10 +381,10 @@ function initTinyMCE(selector) {
         extended_valid_elements: 'i[class|style],span[class|style]',
         non_empty_elements: 'i,span',
         plugins: 'advlist autolink lists link image charmap preview anchor ' +
-                 'searchreplace code fullscreen table wordcount',
-        toolbar: 'undo redo | formatselect | bold italic underline | ' +
-                 'forecolor backcolor | alignleft aligncenter alignright alignjustify | ' +
-                 'bullist numlist outdent indent | link image table | code fullscreen',
+                        'searchreplace code fullscreen table wordcount pastetext',
+               toolbar: 'undo redo | formatselect | bold italic underline | ' +
+                        'forecolor backcolor | alignleft aligncenter alignright alignjustify | ' +
+                        'bullist numlist outdent indent | link image table | pastetext removeformat | code fullscreen',
         automatic_uploads: true,
         images_upload_url: '/admin/filemanager/upload-tinymce',
         image_advtab: true,
