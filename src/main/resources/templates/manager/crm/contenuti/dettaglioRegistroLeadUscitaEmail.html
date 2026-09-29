@@ -84,10 +84,10 @@
                     <label for="l1" class="form-label">Account di posta</label>
                     <select name="l1" id="l1" class="form-select obbligatorio">
                       <option value=""></option>
-                      <option th:each="acc : ${config != null and config.amministratore != null ? config.amministratore.idaccountemail : {}}"
-                              th:value="${acc}"
-                              th:text="${acc}"
-                              th:selected="${registroLead.l1 != null and registroLead.l1 == acc}">
+                      <option th:each="acc : ${accountsEmail}"
+                              th:value="${acc.id}"
+                              th:text="${acc.emailAccount}"
+                              th:selected="${registroLead.l1 != null and registroLead.l1 == acc.id.toString()}">
                       </option>
                     </select>
                   </div>
@@ -198,7 +198,12 @@
 
             <div class="card border">
               <div class="card-body">
-                <h4 class="mb-3">Messaggio email</h4>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <h4 class="mb-0">Messaggio email</h4>
+                  <button type="button" class="btn btn-outline-primary btn-sm" onclick="apriRisposteStandard()">
+                    <i class="ti ti-message-2 me-1"></i> Inserisci risposta standard
+                  </button>
+                </div>
 
                 <div class="row">
                   <div class="col-12">
@@ -207,6 +212,23 @@
                                                   class="tinymce5newsletter"
                                                   rows="20"
                                                   th:text="${registroLead.notalead}"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal Risposte Standard -->
+            <div class="modal fade" id="modalRisposteStandard" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Scegli una risposta standard</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div id="risposteStandardLoading" class="text-muted text-center py-3">Caricamento...</div>
+                    <div id="risposteStandardVuoto" class="text-muted text-center py-3" style="display:none">Nessuna risposta standard disponibile.</div>
+                    <div id="risposteStandardLista" class="list-group"></div>
                   </div>
                 </div>
               </div>
@@ -285,9 +307,72 @@
             return false;
         }
 
-        form.classList.add('was-validated');
+                form.classList.add('was-validated');
         form.submit();
         return true;
+    }
+
+    var risposteStandardCache = null;
+
+    function apriRisposteStandard() {
+        var modalEl = document.getElementById('modalRisposteStandard');
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        if (risposteStandardCache) {
+            renderRisposteStandard(risposteStandardCache);
+            return;
+        }
+
+        document.getElementById('risposteStandardLoading').style.display = 'block';
+        document.getElementById('risposteStandardVuoto').style.display = 'none';
+        document.getElementById('risposteStandardLista').innerHTML = '';
+
+        fetch('/admin/crm/risposte/api')
+            .then(function (r) { return r.json(); })
+            .then(function (dati) {
+                risposteStandardCache = dati;
+                renderRisposteStandard(dati);
+            })
+            .catch(function () {
+                document.getElementById('risposteStandardLoading').textContent = 'Errore nel caricamento delle risposte standard.';
+            });
+    }
+
+    function renderRisposteStandard(dati) {
+        document.getElementById('risposteStandardLoading').style.display = 'none';
+        var lista = document.getElementById('risposteStandardLista');
+        lista.innerHTML = '';
+
+        if (!dati || dati.length === 0) {
+            document.getElementById('risposteStandardVuoto').style.display = 'block';
+            return;
+        }
+
+        dati.forEach(function (t) {
+            var item = document.createElement('a');
+            item.href = 'javascript:void(0)';
+            item.className = 'list-group-item list-group-item-action';
+            item.innerHTML = '<div class="fw-semibold">' + (t.titolo || '(senza titolo)') + '</div>' +
+                (t.descrizione ? '<div class="small text-muted">' + t.descrizione + '</div>' : '');
+            item.addEventListener('click', function () {
+                inserisciRispostaStandard(t.contenuto || '');
+            });
+            lista.appendChild(item);
+        });
+    }
+
+    function inserisciRispostaStandard(contenuto) {
+        if (typeof tinymce !== 'undefined' && tinymce.get('notalead')) {
+            tinymce.get('notalead').insertContent(contenuto);
+        } else {
+            var textarea = document.getElementById('notalead');
+            textarea.value += contenuto;
+        }
+
+        var modalEl = document.getElementById('modalRisposteStandard');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
     }
   </script>
 

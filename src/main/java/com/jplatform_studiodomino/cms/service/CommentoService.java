@@ -126,6 +126,24 @@ public class CommentoService {
         return commentoRepository.findCommentiApprovatiByOggetto(idoggetto);
     }
 
+    /**
+     * Carica messaggi per tipologia e stato (es. Gestione Messaggi WEB)
+     */
+    public List<Commento> findByTipologiaEStato(String tipologia, String stato) {
+        return commentoRepository.findByTipologiaAndStatoOrderByIdDesc(tipologia, stato);
+    }
+
+    private static final int MESSAGGI_WEB_PAGE_SIZE = 20;
+
+    /**
+     * Stessa ricerca, paginata — usata dall'elenco "Gestione Messaggi WEB".
+     */
+    public org.springframework.data.domain.Page<Commento> findByTipologiaEStatoPaged(String tipologia, String stato, int page) {
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(Math.max(page, 0), MESSAGGI_WEB_PAGE_SIZE);
+        return commentoRepository.findByTipologiaAndStatoOrderByIdDesc(tipologia, stato, pageable);
+    }
+
     // ===== MODERAZIONE =====
 
     /**

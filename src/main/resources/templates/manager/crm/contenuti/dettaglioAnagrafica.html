@@ -67,6 +67,11 @@
               <i class="ti ti-adjustments me-1"></i> Altri dati
             </a>
           </li>
+          <li class="nav-item" th:if="${elencoAnagrafico != null && !#lists.isEmpty(elencoAnagrafico) && elencoAnagrafico[0] != null && elencoAnagrafico[0].id != null && elencoAnagrafico[0].id > 0}">
+            <a class="nav-link" href="#tab_05" data-bs-toggle="tab" role="tab">
+              <i class="ti ti-history me-1"></i> Registro attività
+            </a>
+          </li>
         </ul>
       </div>
 
@@ -281,6 +286,47 @@
                   </select>
                 </div>
               </th:block>
+            </div>
+          </div>
+
+          <!-- TAB 05 -->
+          <div id="tab_05" class="tab-pane fade" role="tabpanel"
+               th:if="${elencoAnagrafico != null && !#lists.isEmpty(elencoAnagrafico) && elencoAnagrafico[0] != null && elencoAnagrafico[0].id != null && elencoAnagrafico[0].id > 0}">
+            <div class="d-flex justify-content-end mb-3">
+              <a th:href="@{/admin/crm/lead/new/diretto(idutente=${elencoAnagrafico[0].id})}" class="btn btn-primary btn-sm">
+                <i class="ti ti-checkbox me-1"></i> Nuova attività
+              </a>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordered table-striped mb-0">
+                <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Direzione</th>
+                  <th>Tipo</th>
+                  <th>Data</th>
+                  <th>Nota</th>
+                  <th>Azioni</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${registroAttivita}">
+                  <td th:text="${r.id}"></td>
+                  <td th:text="${r.direzione == 'e' ? 'Entrata' : 'Uscita'}"></td>
+                  <td th:text="${r.store}"></td>
+                  <td th:text="${r.data}"></td>
+                  <td th:text="${r.notalead}"></td>
+                  <td>
+                    <a th:href="@{/admin/crm/lead/{id}(id=${r.id})}" title="Apri">
+                      <i class="fas fa-pencil-alt"></i>
+                    </a>
+                  </td>
+                </tr>
+                <tr th:if="${registroAttivita == null || #lists.isEmpty(registroAttivita)}">
+                  <td colspan="6" class="text-center text-muted py-3">Nessuna attività registrata per questo contatto.</td>
+                </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 

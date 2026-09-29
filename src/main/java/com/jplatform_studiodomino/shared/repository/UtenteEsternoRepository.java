@@ -13,7 +13,6 @@ import java.util.Optional;
 @Repository
 public interface UtenteEsternoRepository extends JpaRepository<UtenteEsterno, Integer> {
 
-    // ===== RICERCHE BASE ===== (di Raffaele, invariate)
 
     @Query("SELECT u FROM UtenteEsterno u WHERE LOWER(u.username) = LOWER(:username)")
     Optional<UtenteEsterno> findByUsernameIgnoreCase(@Param("username") String username);
@@ -28,7 +27,6 @@ public interface UtenteEsternoRepository extends JpaRepository<UtenteEsterno, In
     boolean existsByEmailIgnoreCase(String email);
     boolean existsByUsernameIgnoreCase(String username);
 
-    // ===== RICERCHE AVANZATE ===== (di Raffaele, invariate)
 
     @Query("SELECT u FROM UtenteEsterno u WHERE u.idGruppo LIKE %:gruppo%")
     List<UtenteEsterno> findByGruppo(@Param("gruppo") String gruppo);
@@ -47,7 +45,6 @@ public interface UtenteEsternoRepository extends JpaRepository<UtenteEsterno, In
     @Query(value = "SELECT * FROM utenteesterno WHERE 1=1 :sqlCondition", nativeQuery = true)
     List<UtenteEsterno> findWithCustomSql(@Param("sqlCondition") String sqlCondition);
 
-    // ===== QUERY STATISTICHE ===== (di Raffaele, invariate)
 
     @Query("SELECT COUNT(u) FROM UtenteEsterno u WHERE u.idGruppo LIKE %:gruppo%")
     long countByGruppo(@Param("gruppo") String gruppo);
@@ -58,7 +55,6 @@ public interface UtenteEsternoRepository extends JpaRepository<UtenteEsterno, In
     List<UtenteEsterno> findByComuneOrderByCognomeAscNomeAsc(String comune);
     List<UtenteEsterno> findByProvinciaOrderByCognomeAscNomeAsc(String provincia);
 
-    // ===== UPDATE OPERATIONS ===== (di Raffaele, invariate)
 
     @Modifying
     @Query("UPDATE UtenteEsterno u SET u.navigationProfile = :profile WHERE u.id = :id")
@@ -96,6 +92,7 @@ public interface UtenteEsternoRepository extends JpaRepository<UtenteEsterno, In
      * Vecchio: DAO.getElencoUtenteEsterno("order by id desc limit 0,10")
      */
     List<UtenteEsterno> findTop10ByOrderByIdDesc();
+    List<UtenteEsterno> findTop10ByStatusOrderByIdDesc(String status);
 
     /**
      * Utenti destinatari newsletter senza filtro gruppo.

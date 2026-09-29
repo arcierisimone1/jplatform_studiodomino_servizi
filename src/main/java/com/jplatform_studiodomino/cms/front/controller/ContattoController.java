@@ -1,8 +1,7 @@
 package com.jplatform_studiodomino.cms.front.controller;
 
 import com.jplatform_studiodomino.cms.admin.service.EmailSenderService;
-import com.jplatform_studiodomino.crm.entity.RegistroLead;
-import com.jplatform_studiodomino.crm.service.RegistroLeadService;
+import com.jplatform_studiodomino.cms.service.CommentoService;
 import com.jplatform_studiodomino.shared.config.Configurazione;
 import com.jplatform_studiodomino.shared.service.ConfigurazioneService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,26 +13,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
 /**
  * Riceve l'invio del form "Richiedi Informazioni" (fragment
- * site01/fragments/jspUser/contatti2), salva una riga RegistroLead
- * (direzione=entrata, store=diretto) e reindirizza alla pagina di
- * provenienza mostrando esito/errore.
+ * site01/fragments/jspUser/contatti2) e salva un Messaggio Web
+ * (tabella commenti, tipologia="web") in attesa di essere
+ * gestito e profilato in Lead dallo staff CRM.
  */
 @Controller
 @RequiredArgsConstructor
 @Slf4j
 public class ContattoController {
 
-    private static final DateTimeFormatter DATA_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final String DEFAULT_RETURN = "/front/370/Contatti";
-    private static final String EMAIL_NOTIFICA_STAFF = "info@studiodominoweb.com";
+    private static final String EMAIL_NOTIFICA_STAFF = "segreteria@studiodomino.com";
 
     private final ConfigurazioneService configurazioneService;
-    private final RegistroLeadService registroLeadService;
+    private final CommentoService commentoService;
     private final EmailSenderService emailSenderService;
 
     @PostMapping("/contatti/invia")
@@ -80,32 +75,29 @@ public class ContattoController {
 
             Configurazione config = configurazioneService.getOrCreateConfiguration(request);
 
-            RegistroLead lead = new RegistroLead();
-            lead.setDirezione("e");
-            lead.setIdutente(0);
-            lead.setIdleadstore(parseIntSafe(idoggetto));
-            lead.setStore("diretto");
-            lead.setStato("0");
-            lead.setData(LocalDate.now().format(DATA_FORMAT));
-            lead.setL1(nome != null ? nome.trim() : "");
-            lead.setL2(cognome != null ? cognome.trim() : "");
-            lead.setL3(email != null ? email.trim() : "");
-            lead.setL4(telefono != null ? telefono.trim() : "");
-
             String oggettoFinale = (oggetto != null && !oggetto.isBlank()) ? oggetto : "Informazioni generali";
-            lead.setNotalead(oggettoFinale + " : " + (messaggioInformativo != null ? messaggioInformativo.trim() : ""));
+            String testoMessaggio = oggettoFinale + " : " + (messaggioInformativo != null ? messaggioInformativo.trim() : "");
 
-            registroLeadService.crea(lead, config);
+            var commento = commentoService.creaCommento(
+                    idoggetto,
+                    nome != null ? nome.trim() : "",
+                    cognome != null ? cognome.trim() : "",
+                    email != null ? email.trim() : "",
+                    testoMessaggio,
+                    "0",
+                    "web");
+            commento.setL1(telefono != null ? telefono.trim() : "");
+            commentoService.save(commento);
 
             // ===== NOTIFICA STAFF VIA EMAIL =====
-            // il lead resta salvato nel CRM anche se l'invio email fallisce (es. SMTP giù)
+            // il messaggio resta salvato nel CRM anche se l'invio email fallisce (es. SMTP giù)
             try {
                 String testoEmail = "<p>Nuova richiesta ricevuta dal sito web.</p>"
                         + "<p><strong>Oggetto:</strong> " + oggettoFinale + "</p>"
-                        + "<p><strong>Nome:</strong> " + lead.getL1() + "<br>"
-                        + "<strong>Cognome:</strong> " + lead.getL2() + "<br>"
-                        + "<strong>Email:</strong> " + lead.getL3() + "<br>"
-                        + "<strong>Telefono:</strong> " + lead.getL4() + "</p>"
+                        + "<p><strong>Nome:</strong> " + commento.getNome() + "<br>"
+                        + "<strong>Cognome:</strong> " + commento.getCognome() + "<br>"
+                        + "<strong>Email:</strong> " + commento.getEmail() + "<br>"
+                        + "<strong>Telefono:</strong> " + commento.getL1() + "</p>"
                         + "<p><strong>Messaggio:</strong><br>"
                         + (messaggioInformativo != null ? messaggioInformativo.trim() : "") + "</p>";
 
@@ -114,7 +106,24 @@ public class ContattoController {
                         "Nuova richiesta informazioni dal sito - " + oggettoFinale,
                         testoEmail);
             } catch (Exception emailEx) {
-                log.warn("Lead salvato ma invio email di notifica fallito: {}", emailEx.getMessage());
+                log.warn("Messaggio salvato ma invio email di notifica fallito: {}", emailEx.getMessage());
+            }
+
+            // ===== CONFERMA VIA EMAIL AL MITTENTE =====
+            try {
+                String testoConferma = "<p>Gentile " + commento.getNome() + " " + commento.getCognome() + ",</p>"
+                        + "<p>la sua richiesta è stata inviata con successo. "
+                        + "Le forniremo una risposta nel più breve tempo possibile.</p>"
+                        + "<p>Cordiali saluti.</p>";
+
+                if (commento.getEmail() != null && !commento.getEmail().isBlank()) {
+                    emailSenderService.inviaEmail(
+                            commento.getEmail(), null,
+                            "Richiesta ricevuta - " + oggettoFinale,
+                            testoConferma);
+                }
+            } catch (Exception emailEx) {
+                log.warn("Messaggio salvato ma invio email di conferma al mittente fallito: {}", emailEx.getMessage());
             }
 
             redirectAttributes.addFlashAttribute("contattoOk", true);
@@ -126,13 +135,5 @@ public class ContattoController {
         }
 
         return "redirect:" + redirect;
-    }
-
-    private int parseIntSafe(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (Exception e) {
-            return 0;
-        }
     }
 }

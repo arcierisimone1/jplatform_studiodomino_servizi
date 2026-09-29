@@ -135,7 +135,15 @@
                         </li>
 
                         <li class="pc-item" id="sb053">
-                            <a th:href="@{/admin/crm/lead}" class="pc-link">Gestione LEAD</a>
+                            <a th:href="@{/admin/crm/lead}" class="pc-link">Gestione Messaggi WEB</a>
+                        </li>
+
+                        <li class="pc-item" id="sb054">
+                            <a th:href="@{/admin/crm/lead/registrolead}" class="pc-link">Gestione Registro Lead</a>
+                        </li>
+
+                        <li class="pc-item" id="sb055">
+                            <a th:href="@{/admin/crm/risposte}" class="pc-link">Gestione Risposte Standard</a>
                         </li>
 
                     </ul>
@@ -223,35 +231,43 @@
 
         </div>
     </div>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-    var currentUrl = window.location.pathname;
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        var currentUrl = window.location.pathname;
 
-    // Se siamo su una pagina "new" o "save", attiva il dashboard CRM
-    if (currentUrl.includes('/new/') || currentUrl.includes('/save')) {
-        var dashboardLink = document.querySelector('#sb051 .pc-link');
-        if (dashboardLink) {
-            dashboardLink.parentElement.classList.add('active');
-            var parentMenu = dashboardLink.closest('.pc-hasmenu');
-            if (parentMenu) {
-                parentMenu.classList.add('pc-trigger', 'active');
-                var submenu = parentMenu.querySelector('.pc-submenu');
-                if (submenu) submenu.style.display = 'block';
+        // Se siamo su una pagina "new" o "save", attiva il dashboard CRM
+        if (currentUrl.includes('/new/') || currentUrl.includes('/save')) {
+            var dashboardLink = document.querySelector('#sb051 .pc-link');
+            if (dashboardLink) {
+                dashboardLink.parentElement.classList.add('active');
+                var parentMenu = dashboardLink.closest('.pc-hasmenu');
+                if (parentMenu) {
+                    parentMenu.classList.add('pc-trigger', 'active');
+                    var submenu = parentMenu.querySelector('.pc-submenu');
+                    if (submenu) submenu.style.display = 'block';
+                }
             }
+            return;
         }
-        return;
-    }
 
-    var menuLinks = document.querySelectorAll(".pc-sidebar .pc-link");
-    menuLinks.forEach(function(link) {
-        var href = link.getAttribute("href");
-        if (!href || href === "javascript:void(0)") return;
+            var menuLinks = document.querySelectorAll(".pc-sidebar .pc-link");
+        var bestLink = null;
+        var bestLength = -1;
 
-        var isActive = currentUrl === href || currentUrl.startsWith(href + "/");
+        menuLinks.forEach(function(link) {
+            var href = link.getAttribute("href");
+            if (!href || href === "javascript:void(0)") return;
 
-        if (isActive) {
-            link.parentElement.classList.add("active");
-            var parentMenu = link.closest(".pc-hasmenu");
+            var isMatch = currentUrl === href || currentUrl.startsWith(href + "/");
+            if (isMatch && href.length > bestLength) {
+                bestLink = link;
+                bestLength = href.length;
+            }
+        });
+
+        if (bestLink) {
+            bestLink.parentElement.classList.add("active");
+            var parentMenu = bestLink.closest(".pc-hasmenu");
             if (parentMenu) {
                 parentMenu.classList.add("pc-trigger", "active");
                 var submenu = parentMenu.querySelector(".pc-submenu");
@@ -259,8 +275,7 @@
             }
         }
     });
-});
-</script>
+    </script>
 </nav>
 </body>
 </html>

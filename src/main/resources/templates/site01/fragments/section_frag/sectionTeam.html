@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<!-- ========================================
-     FRAGMENT: Organigramma / Team
-     sectionType.page3 = 'sectionTeam'
-     Mostra le persone (contenuti di tipo 'dettaglioContenutoPersona') di
-     questa sezione come griglia "chi lavora con noi", sul markup reale
-     del tema Educeet (it-team-item), come in TeamOne.tsx del template originale.
-     Campi usati: titolo = nome persona, logo = foto, text1 = ruolo.
-     ======================================== -->
+<!-- sectionType.page3 = 'sectionTeam': griglia persone (tipo 'dettaglioContenutoPersona').
+     Campi: titolo = nome, logo = foto, text1 = ruolo. -->
 <th:block th:fragment="content">
 
     <section class="it-team-area z-index-1 pb-100">

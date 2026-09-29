@@ -2,14 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<!-- ========================================
-     FRAGMENT: Section Web Sidebar
-     sectionType.page3 = 'sectionWebSidebar'
-     Ricostruita sul markup reale del tema Educeet (sidebar-widget-list,
-     postbox-thumb-box, it-pagination). Le classi precedenti (feature-box,
-     card/box-shadow-small/hover-box, icon-feather-*, bg-very-light-gray,
-     pagination-style-01) non esistono nel CSS di Educeet.
-     ======================================== -->
+<!-- sectionType.page3 = 'sectionWebSidebar' -->
 <th:block th:fragment="content">
 
     <section class="pt-0 pb-100">
@@ -20,19 +13,11 @@
                     <span class="it-section-subtitle yellow-style">Chi siamo</span>
                     <h2 class="it-section-title" th:text="${section.titolo}">L'azienda</h2>
                 </div>
-                <!-- Testo a piena larghezza, unica colonna di lettura (niente più CSS
-                     multi-column, che con testo/immagine disomogenei creava colonne
-                     sbilanciate e vuoti enormi). L'immagine, se presente nel campo
-                     "Testo" del manager, viene affiancata al testo con un float a
-                     sinistra in stile editoriale classico. -->
+                <!-- immagine nel testo: float a sinistra in stile editoriale -->
                 <style>
                     .it-azienda-testo { max-width: 100%; }
                     .it-azienda-testo p { margin-bottom: 18px; text-align: justify; }
-                    /* Il testo incollato nel manager contiene un <div class="row"> attorno
-                       solo al blocco "Chi siamo": essendo una vera classe Bootstrap applica
-                       margini negativi e sposta quel blocco rispetto al resto ("La nostra
-                       sede"), che non ha lo stesso wrapper. Neutralizziamo qui senza toccare
-                       il contenuto salvato nel CMS. */
+                    /* neutralizza il <div class="row"> Bootstrap presente nel testo CMS (margini negativi) */
                     .it-azienda-testo .row { margin-left: 0 !important; margin-right: 0 !important; }
                     .it-azienda-testo .row > * { padding-left: 0 !important; padding-right: 0 !important; }
                     .it-azienda-testo img {
@@ -182,7 +167,7 @@
             <div class="row gx-25">
                 <div class="col-xxl-2 col-xl-3 col-lg-3 col-md-4 col-sm-6" th:each="admin : ${team}">
                     <div class="it-team-item text-center p-relative mb-35">
-                        <div class="it-team-content-box">
+                        <div class="it-team-content-box" style="height:140px; overflow:hidden;">
                             <div class="it-team-content">
                                 <h4 class="it-team-title" th:text="${admin.nome + ' ' + admin.cognome}">Nome Cognome</h4>
                                 <span th:if="${admin.incarico != null and !admin.incarico.isEmpty()}" th:text="${admin.incarico}">Ruolo</span>

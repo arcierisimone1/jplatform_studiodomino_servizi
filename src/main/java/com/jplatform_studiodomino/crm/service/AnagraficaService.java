@@ -78,9 +78,9 @@ public class AnagraficaService {
             return utenteEsternoRepository.searchByNomeCognome(termineNomeCognome);
         }
 
-        // Nessun filtro → restituisce tutti gli attivi ordinati
+        // Nessun filtro → non mostrare nulla (l'utente deve inserire almeno un criterio)
         if (soloNomeCognome) {
-            return utenteEsternoRepository.findUtentiAttivi();
+            return java.util.List.of();
         }
 
         // Filtri multipli: carica tutti gli attivi e filtra in memoria.
@@ -137,6 +137,21 @@ public class AnagraficaService {
     public void elimina(Integer id) {
         utenteEsternoRepository.deleteById(id);
         log.info("Utente eliminato: id={}", id);
+    }
+
+    @Transactional
+    public int eliminaPerEmail(List<String> emails) {
+        int eliminati = 0;
+        for (String email : emails) {
+            if (email == null || email.isBlank()) continue;
+            var utente = utenteEsternoRepository.findByEmailIgnoreCase(email.trim());
+            if (utente.isPresent()) {
+                utenteEsternoRepository.deleteById(utente.get().getId());
+                eliminati++;
+            }
+        }
+        log.info("Eliminati {} contatti da CSV", eliminati);
+        return eliminati;
     }
 
     // =====================================================================

@@ -1,6 +1,10 @@
 package com.jplatform_studiodomino.crm.service;
 
 import com.jplatform_studiodomino.cms.admin.service.EmailSenderService;
+import com.jplatform_studiodomino.shared.entity.Account;
+import com.jplatform_studiodomino.shared.repository.AccountRepository;
+import com.jplatform_studiodomino.cms.entity.Commento;
+import com.jplatform_studiodomino.cms.service.CommentoService;
 import com.jplatform_studiodomino.crm.entity.RegistroLead;
 import com.jplatform_studiodomino.crm.repository.AreaInteresseRepository;
 import com.jplatform_studiodomino.crm.repository.RegistroLeadRepository;
@@ -31,6 +35,8 @@ public class RegistroLeadService {
     private final UtenteRepository utenteRepository;
     private final AnagraficaService anagraficaService;
     private final AreaInteresseRepository areaInteresseRepository;
+    private final CommentoService commentoService;
+    private final AccountRepository accountRepository;
 
     // Adatta questi due service ai nomi reali del tuo progetto
     private final EmailSenderService emailSenderService;
@@ -40,11 +46,16 @@ public class RegistroLeadService {
     // FIND
     // =====================================================================
 
-    public List<RegistroLead> findAll(String direzione, String stato) {
-        if ("4".equals(stato)) {
-            return registroLeadRepository.findByDirezioneOrderByIdDesc(direzione);
-        }
-        return registroLeadRepository.findByDirezioneAndStatoOrderByIdDesc(direzione, stato);
+    private static final int REGISTRO_LEAD_PAGE_SIZE = 20;
+
+    /**
+     * Elenco paginato di Registro Lead per direzione/stato (usato da "Gestione Registro Lead").
+     * Fix: il filtro per stato viene sempre applicato, anche per "Completato" (stato "4"),
+     */
+    public org.springframework.data.domain.Page<RegistroLead> findAllPaged(String direzione, String stato, int page) {
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(Math.max(page, 0), REGISTRO_LEAD_PAGE_SIZE);
+        return registroLeadRepository.findByDirezioneAndStatoOrderByIdDesc(direzione, stato, pageable);
     }
 
     public RegistroLead findById(Long id) {
@@ -57,18 +68,40 @@ public class RegistroLeadService {
         return utenteEsternoRepository.findById(idUtente).orElse(new UtenteEsterno());
     }
 
+    /**
+     * Tutte le attività/richieste (RegistroLead) collegate a questo contatto.
+     * Equivalente al vecchio "Registro delle attività" nella scheda anagrafica.
+     */
+    public List<RegistroLead> findByUtente(Integer idUtente) {
+        if (idUtente == null || idUtente <= 0) return List.of();
+        return registroLeadRepository.findByIdutenteOrderByIdDesc(idUtente);
+    }
+
     public Utente findAmministratoreById(String id) {
         if (id == null || id.isBlank()) return null;
         return utenteRepository.findById(Integer.parseInt(id)).orElse(null);
+    }
+
+    public List<Utente> searchAmministratori(String term) {
+        if (term == null || term.isBlank()) return List.of();
+        String t = term.trim().toLowerCase();
+        return utenteRepository.findAll().stream()
+                .filter(u -> (u.getNome() != null && u.getNome().toLowerCase().contains(t))
+                        || (u.getCognome() != null && u.getCognome().toLowerCase().contains(t)))
+                .limit(20)
+                .toList();
     }
 
     public List<?> findAreeInteresse() {
         return areaInteresseRepository.findAllByOrderByDescrizioneAsc();
     }
 
-    public Object findCommentoById(Long idLeadStore) {
-        log.warn("findCommentoById: CommentoRepository non ancora disponibile");
-        return null;
+    public Commento findCommentoById(Long idLeadStore) {
+        return commentoService.findById(idLeadStore.intValue()).orElse(null);
+    }
+
+    public Integer findIdUtenteByEmail(String email) {
+        return anagraficaService.getIdByEmail(email);
     }
 
     public Object findEmailStoreById(Integer idLeadStore) {
@@ -200,15 +233,39 @@ public class RegistroLeadService {
             }
         }
 
-        /*
-         * Se il tuo EmailSenderService usa un metodo diverso,
-         * cambia solo questa riga.
-         *
-         * Esempi possibili:
-         * emailSenderService.inviaEmail(destinatario, oggetto, testo);
-         * emailSenderService.sendHtml(destinatario, oggetto, testo);
-         */
-        emailSenderService.inviaEmail(destinatario, null, oggetto, testo);
+        // Account di posta scelto dall'operatore (campo l1) — se non trovato,
+        // ripiega sull'account di default come prima
+        Account account = null;
+        if (registroLead.getL1() != null && !registroLead.getL1().isBlank()) {
+            try {
+                account = accountRepository.findById(Integer.parseInt(registroLead.getL1().trim())).orElse(null);
+            } catch (NumberFormatException e) {
+                log.warn("Id account email non valido: {}", registroLead.getL1());
+            }
+        }
+
+        if (account != null) {
+            emailSenderService.inviaEmailConAccount(account, destinatario, null, oggetto, testo, null);
+        } else {
+            emailSenderService.inviaEmail(destinatario, null, oggetto, testo);
+        }
+    }
+
+    /** Account email selezionabili dall'operatore (campo utente.idaccountemail, CSV di id). */
+    public List<Account> findAccountsEmail(String idAccountEmailCsv) {
+        if (idAccountEmailCsv == null || idAccountEmailCsv.isBlank()) return List.of();
+        return java.util.Arrays.stream(idAccountEmailCsv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(s -> {
+                    try {
+                        return accountRepository.findById(Integer.parseInt(s)).orElse(null);
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                })
+                .filter(java.util.Objects::nonNull)
+                .toList();
     }
 
     // =====================================================================
@@ -319,7 +376,10 @@ public class RegistroLeadService {
     @Transactional
     private void aggiornaStatoSorgente(RegistroLead lead) {
         if ("commenti".equals(lead.getStore())) {
-            log.debug("TODO: aggiorna commento id={} stato=2", lead.getIdleadstore());
+            commentoService.findById(lead.getIdleadstore()).ifPresent(commento -> {
+                commento.setStato("2"); // "2" = già profilato in Lead
+                commentoService.save(commento);
+            });
         } else if ("emailstore".equals(lead.getStore())) {
             log.debug("TODO: aggiorna emailstore id={} stato=2", lead.getIdleadstore());
         }

@@ -257,10 +257,19 @@
                                         onclick="var f=this.nextElementSibling; f.classList.toggle('is-open'); if(f.classList.contains('is-open')){ f.querySelector('input').focus(); }">
                                     <i class="fa-light fa-magnifying-glass"></i>
                                 </button>
-                                <form th:action="@{/ricerca}" method="get" class="it-search-expand"
+                                <form id="cs_search_form" class="it-search-expand"
                                       style="position:absolute; right:0; top:100%; margin-top:10px; background:#fff; box-shadow:0 15px 30px rgba(0,0,0,.12); border-radius:10px; padding:10px; z-index:20;">
-                                    <input type="text" name="campo1" placeholder="Cerca..." style="border:1px solid rgba(0,0,0,.1); border-radius:6px; padding:8px 12px; width:220px;"/>
+                                    <input type="text" id="cs_search_input" placeholder="Cerca..." style="border:1px solid rgba(0,0,0,.1); border-radius:6px; padding:8px 12px; width:220px;"/>
                                 </form>
+                                <script>
+                                    document.getElementById('cs_search_form').addEventListener('submit', function (e) {
+                                        e.preventDefault();
+                                        var q = document.getElementById('cs_search_input').value.trim();
+                                        if (q) {
+                                            window.location.href = '/ricerca/' + encodeURIComponent(q.replace(/\s+/g, '-'));
+                                        }
+                                    });
+                                </script>
                             </div>
 
                             <a th:href="@{/front/370/Contatti}" class="it-btn-yellow d-none d-md-flex">

@@ -20,23 +20,31 @@
                 Utilizzare le opzioni rapide per accedere alle funzioni descritte.
               </p>
             </div>
-              <div class="card-body d-flex flex-wrap gap-2">
-                <a th:href="@{/admin/crm/lead/new/diretto}" class="btn btn-primary shadow-sm" title="Inserisci nuovo task/lead utente">
-                  <i class="ti ti-checkbox me-2"></i> <span class="btn-text">Nuova attività</span>
-                </a>
+            <div class="card-body d-flex flex-wrap gap-2">
+              <a th:href="@{/admin/crm/dashboard}" class="btn btn-outline-secondary shadow-sm" title="Aggiorna la dashboard">
+                <i class="ti ti-refresh me-2"></i> <span class="btn-text">Aggiorna</span>
+              </a>
 
-                <a th:href="@{/admin/crm/utenti/new}" class="btn btn-success shadow-sm" title="Inserisci nuova anagrafica utente">
-                  <i class="ti ti-user-plus me-2"></i> <span class="btn-text">Nuovo Contatto</span>
-                </a>
+              <a th:href="@{/admin/crm/dashboard(all='all')}" class="btn btn-outline-secondary shadow-sm" title="Mostra le attività di tutti gli operatori">
+                <i class="ti ti-users me-2"></i> <span class="btn-text">Tutti i lead</span>
+              </a>
 
-                <a th:href="@{/admin/crm/lead/new/uscita/Email}" class="btn btn-info text-white shadow-sm">
-                  <i class="ti ti-mail me-2"></i> <span class="btn-text">Invia email</span>
-                </a>
+              <a th:href="@{/admin/crm/lead/new/diretto}" class="btn btn-primary shadow-sm" title="Inserisci nuovo task/lead utente">
+                <i class="ti ti-checkbox me-2"></i> <span class="btn-text">Nuova attività</span>
+              </a>
 
-                <a th:href="@{/admin/crm/lead/new/uscita/Sms}" class="btn btn-info text-white shadow-sm">
-                  <i class="ti ti-message me-2"></i> <span class="btn-text">Invia SMS</span>
-                </a>
-              </div>
+              <a th:href="@{/admin/crm/utenti/new}" class="btn btn-success shadow-sm" title="Inserisci nuova anagrafica utente">
+                <i class="ti ti-user-plus me-2"></i> <span class="btn-text">Nuovo Contatto</span>
+              </a>
+
+              <a th:href="@{/admin/crm/lead/new/uscita/Email}" class="btn btn-info text-white shadow-sm">
+                <i class="ti ti-mail me-2"></i> <span class="btn-text">Invia email</span>
+              </a>
+
+              <a th:href="@{/admin/crm/lead/new/uscita/Sms}" class="btn btn-info text-white shadow-sm">
+                <i class="ti ti-message me-2"></i> <span class="btn-text">Invia SMS</span>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -52,14 +60,15 @@
                   <tr>
                     <th>Data</th>
                     <th>Utente</th>
-                    <th style="width:50%">Da fare</th>
+                    <th style="width:45%">Da fare</th>
                     <th>Stato</th>
+                    <th>Assegnato</th>
                     <th>Azioni</th>
                   </tr>
                   </thead>
                   <tbody>
                   <tr th:if="${#lists.isEmpty(todoLead)}">
-                    <td colspan="5" class="text-center text-muted py-3">
+                    <td colspan="6" class="text-center text-muted py-3">
                       Nessuna attività da completare
                     </td>
                   </tr>
@@ -81,13 +90,20 @@
                                                                   (${lead.stato == '2'} ? 'bg-info' :
                                                                   (${lead.stato == '3'} ? 'bg-primary' :
                                                                   (${lead.stato == '4'} ? 'bg-success' : 'bg-danger'))))"
-                            th:text="${lead.stato == '0'} ? 'Non gestito' :
+                            th:text="${lead.stato == '0'} ? 'Da iniziare' :
                                                            (${lead.stato == '1'} ? 'Da richiamare' :
                                                            (${lead.stato == '2'} ? 'Inviare email' :
                                                            (${lead.stato == '3'} ? 'In lavorazione' :
                                                            (${lead.stato == '4'} ? 'Completato' : 'Annullato'))))">
                                                 Stato
                                             </span>
+                    </td>
+                    <td>
+                      <span th:if="${lead.amministratore != null}"
+                            th:text="${(lead.amministratore.nome != null ? lead.amministratore.nome : '') + ' ' + (lead.amministratore.cognome != null ? lead.amministratore.cognome : '')}">
+                        -
+                      </span>
+                      <span th:if="${lead.amministratore == null}" class="text-muted">-</span>
                     </td>
                     <td>
                       <a th:href="@{/admin/crm/lead/{id}(id=${lead.id})}"
@@ -194,7 +210,8 @@
                 <p class="mb-0 mt-1 small">
                   <span th:text="${commento.messaggio}">Testo messaggio...</span>
                   <span class="text-primary ms-1"
-                        th:text="'#' + ${commento.contenuto?.titolo}"></span>
+                        th:if="${commento.contenuto != null}"
+                        th:text="'#' + ${commento.contenuto.titolo}"></span>
                 </p>
               </li>
             </ul>

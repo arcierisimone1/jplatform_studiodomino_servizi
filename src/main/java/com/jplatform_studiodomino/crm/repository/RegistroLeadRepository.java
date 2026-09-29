@@ -1,6 +1,8 @@
 package com.jplatform_studiodomino.crm.repository;
 
 import com.jplatform_studiodomino.crm.entity.RegistroLead;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -29,6 +31,12 @@ public interface RegistroLeadRepository extends JpaRepository<RegistroLead, Long
      * Vecchio: getRegistroLead(direzione, stato)
      */
     List<RegistroLead> findByDirezioneAndStatoOrderByIdDesc(String direzione, String stato);
+
+    /**
+     * Stessa query, paginata — usata dall'elenco "Gestione Registro Lead"
+     * per non caricare in un colpo solo tutte le righe.
+     */
+    Page<RegistroLead> findByDirezioneAndStatoOrderByIdDesc(String direzione, String stato, Pageable pageable);
 
     List<RegistroLead> findByDirezioneAndStatoAndStoreOrderByIdDesc(String direzione, String stato, String store);
 

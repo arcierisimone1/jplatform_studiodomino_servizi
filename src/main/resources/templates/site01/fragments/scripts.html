@@ -39,17 +39,33 @@
      (stesso comportamento del vecchio sito, vedi sectionCatalogoSidebar.html) -->
 <script th:src="@{|/${config.sito.path2}/js/vendors/isotope.pkgd.js|}"></script>
 
-<!-- WOW.js: anima gli elementi con classe "wow" (es. "wow itfadeUp") quando
-     entrano nel viewport, riprendendo le stesse animazioni Educeet
-     (custom-animation.css, già incluso in head.html). Riusa il file già
-     presente nel progetto per il pannello manager. -->
-<script th:src="@{/manager/assets/js/plugins/wow.min.js}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        if (typeof WOW === 'function') {
-            new WOW({live: false}).init();
-        }
-    });
-</script>
+    <!-- Magnific Popup: lightbox per le gallerie foto -->
+    <script th:src="@{|/${config.sito.path2}/js/jquery.magnific-popup.min.js|}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.jQuery && jQuery.fn.magnificPopup) {
+                var seen = {};
+                jQuery('[data-lightbox-gallery]').each(function () {
+                    var name = jQuery(this).attr('data-lightbox-gallery');
+                    if (seen[name]) return;
+                    seen[name] = true;
+                    jQuery('[data-lightbox-gallery="' + name + '"]').magnificPopup({
+                        type: 'image',
+                        gallery: { enabled: true }
+                    });
+                });
+            }
+        });
+    </script>
+    <script th:src="@{/manager/assets/js/plugins/wow.min.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof WOW === 'function') {
+                new WOW({live: false}).init();
+            }
+        });
+    </script>
+
 
 </th:block>

@@ -20,6 +20,17 @@
                 <main layout:fragment="content"></main>
             </div>
 
+            <div class="sdcp-widget" id="sdcpWidget">
+                <a class="sdcp-pill" href="https://www.polodominopotenza.it/" target="_blank" rel="noopener">
+                    <span class="sdcp-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;"><path d="M22 10L12 5 2 10l10 5 10-5Z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5" stroke="#fff" stroke-width="2"/></svg></span>
+                    <span class="sdcp-text" id="polo-msg">Costruisci il tuo futuro universitario</span>
+                </a>
+                <a class="sdcp-pill" href="https://formazione.studiodomino.com/" target="_blank" rel="noopener">
+                    <span class="sdcp-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;"><path d="M12 6.5C10.5 5 7.5 4.5 4 5v13c3.5-.5 6.5 0 8 1.5M12 6.5C13.5 5 16.5 4.5 20 5v13c-3.5-.5-6.5 0-8 1.5M12 6.5v14" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    <span class="sdcp-text" id="formazione-msg">Trasforma la formazione in opportunità!</span>
+                </a>
+            </div>
+
             <!-- Sezione Footer (sostituibile se necessario) -->
             <th:block layout:fragment="footer">
                 <th:block th:replace="~{site01/fragments/footer :: footer}"></th:block>
@@ -33,4 +44,31 @@
         </th:block>
 
     </body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                var w = document.getElementById('sdcpWidget');
+                if (w) w.classList.add('sdcp-visible');
+            }, 2500);
+
+            var rotations = {
+                "polo-msg": ["Vuoi iscriverti a un'università telematica?", "Scopri le 4 università telematiche di PoloDomino"],
+                "formazione-msg": ["Trasforma la formazione in opportunità!", "Vuoi partecipare a un corso di formazione?", "Vuoi certificarti?", "Scopri il mondo della scuola: doposcuola e supporto didattico"]
+            };
+            Object.keys(rotations).forEach(function (id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                var msgs = rotations[id];
+                var i = 0;
+                setInterval(function () {
+                    i = (i + 1) % msgs.length;
+                    el.style.opacity = 0;
+                    setTimeout(function () {
+                        el.textContent = msgs[i];
+                        el.style.opacity = 1;
+                    }, 300);
+                }, 4000);
+            });
+        });
+    </script>
 </html>

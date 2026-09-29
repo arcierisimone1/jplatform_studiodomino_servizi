@@ -1,9 +1,11 @@
 package com.jplatform_studiodomino.crm.controller;
 
 import com.jplatform_studiodomino.crm.service.AnagraficaService;
+import com.jplatform_studiodomino.crm.service.RegistroLeadService;
 import com.jplatform_studiodomino.shared.config.Configurazione;
 import com.jplatform_studiodomino.shared.entity.UtenteEsterno;
 import com.jplatform_studiodomino.shared.service.ConfigurazioneService;
+import com.jplatform_studiodomino.shared.service.UtenteEsternoService;
 import com.jplatform_studiodomino.shared.util.ViewUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -13,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +32,8 @@ public class AnagraficaController {
 
     private final ConfigurazioneService configurazioneService;
     private final AnagraficaService anagraficaService;
+    private final UtenteEsternoService utenteEsternoService;
+    private final RegistroLeadService registroLeadService;
 
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
 
@@ -37,8 +43,10 @@ public class AnagraficaController {
         Configurazione config = configurazioneService.getConfig(session);
         if (!config.isLogged()) return "redirect:/login";
 
+        config.setGruppi(configurazioneService.getAllGruppi(String.valueOf(config.getIdSito())));
+
         try {
-            model.addAttribute("elencoAnagrafico", anagraficaService.findAll());
+            model.addAttribute("elencoAnagrafico", java.util.List.of());
         } catch (Exception e) {
             log.error("Errore elencoAnagrafico", e);
             model.addAttribute("elencoAnagrafico", List.of());
@@ -99,6 +107,7 @@ public class AnagraficaController {
             UtenteEsterno utente = anagraficaService.findById(id);
             model.addAttribute("utente", utente);
             model.addAttribute("elencoAnagrafico", List.of(utente));
+            model.addAttribute("registroAttivita", registroLeadService.findByUtente(id));
             model.addAttribute("config", config);
         } catch (Exception e) {
             log.error("Errore openAnagrafica id={}", id, e);
@@ -246,6 +255,8 @@ public class AnagraficaController {
         HttpSession session = request.getSession();
         Configurazione config = configurazioneService.getConfig(session);
         if (!config.isLogged()) return "redirect:/login";
+
+        config.setGruppi(configurazioneService.getAllGruppi(String.valueOf(config.getIdSito())));
 
         try {
             List<UtenteEsterno> risultati = anagraficaService.cerca(ricerca);
@@ -413,5 +424,95 @@ public class AnagraficaController {
             log.error("Errore saveAvatar CRM id={}", id, e);
             return ResponseEntity.ok("KO");
         }
+    }
+
+    @PostMapping("/import-csv")
+    public String importaCsv(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "tipo", defaultValue = "esteso") String tipo,
+            @RequestParam(value = "idGruppo", required = false, defaultValue = "") String idGruppo,
+            @RequestParam(value = "status", required = false, defaultValue = "1") String status,
+            @RequestParam(value = "newsletter", required = false, defaultValue = "") String newsletter,
+            @RequestParam(value = "sms", required = false, defaultValue = "") String sms,
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes) {
+
+        HttpSession session = request.getSession();
+        Configurazione config = configurazioneService.getConfig(session);
+        if (!config.isLogged()) return "redirect:/login";
+
+        try {
+            if (file.isEmpty()) {
+                redirectAttributes.addFlashAttribute("csvErrore", "Seleziona un file CSV.");
+                return "redirect:/admin/crm/utenti";
+            }
+
+            int importati;
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(
+                    new java.io.InputStreamReader(file.getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {
+
+                if ("esteso".equals(tipo)) {
+                    List<String[]> righe = reader.lines()
+                            .filter(riga -> !riga.isBlank())
+                            .map(riga -> riga.split(","))
+                            .toList();
+                    importati = utenteEsternoService.importaCsvEsteso(righe, idGruppo, status, newsletter, sms);
+                } else if ("semplificato".equals(tipo)) {
+                    List<String[]> righe = reader.lines()
+                            .filter(riga -> !riga.isBlank())
+                            .map(riga -> riga.split(","))
+                            .toList();
+                    importati = utenteEsternoService.importaCsvSemplificato(righe, idGruppo, status, newsletter, sms);
+                } else {
+                    List<String> righe = reader.lines()
+                            .map(String::trim)
+                            .filter(riga -> !riga.isBlank())
+                            .toList();
+                    importati = utenteEsternoService.importaCsvSemplice(righe, idGruppo);
+                }
+            }
+
+            redirectAttributes.addFlashAttribute("csvOk", "Importati " + importati + " contatti.");
+        } catch (Exception e) {
+            log.error("Errore import CSV contatti", e);
+            redirectAttributes.addFlashAttribute("csvErrore", "Errore durante l'importazione del file.");
+        }
+
+        return "redirect:/admin/crm/utenti";
+    }
+
+    @PostMapping("/rimuovi-csv")
+    public String rimuoviCsv(
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes) {
+
+        HttpSession session = request.getSession();
+        Configurazione config = configurazioneService.getConfig(session);
+        if (!config.isLogged()) return "redirect:/login";
+
+        try {
+            if (file.isEmpty()) {
+                redirectAttributes.addFlashAttribute("csvErrore", "Seleziona un file CSV.");
+                return "redirect:/admin/crm/utenti";
+            }
+
+            List<String> emails;
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(
+                    new java.io.InputStreamReader(file.getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {
+                emails = reader.lines()
+                        .map(String::trim)
+                        .filter(riga -> !riga.isBlank())
+                        .toList();
+            }
+
+            int eliminati = anagraficaService.eliminaPerEmail(emails);
+            redirectAttributes.addFlashAttribute("csvOk", "Rimossi " + eliminati + " contatti.");
+        } catch (Exception e) {
+            log.error("Errore rimozione CSV contatti", e);
+            redirectAttributes.addFlashAttribute("csvErrore", "Errore durante la rimozione.");
+        }
+
+        return "redirect:/admin/crm/utenti";
     }
 }

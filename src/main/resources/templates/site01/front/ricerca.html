@@ -19,16 +19,23 @@
       </p>
 
       <!-- form ricerca -->
-      <form class="d-flex align-items-center gap-3 mb-4" th:action="@{/ricerca}" method="get">
-        <input type="hidden" name="site" th:value="${config.sito.id}" />
-
+      <form id="cs_search_form_results" class="d-flex align-items-center gap-3 mb-4">
         <input class="form-control"
                type="text"
-               name="campo1"
+               id="cs_search_input_results"
                placeholder="Cerca..."
                th:value="${campo1}" />
         <button class="btn btn-success" type="submit">Ricerca</button>
       </form>
+      <script>
+        document.getElementById('cs_search_form_results').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var q = document.getElementById('cs_search_input_results').value.trim();
+            if (q) {
+                window.location.href = '/ricerca/' + encodeURIComponent(q.replace(/\s+/g, '-'));
+            }
+        });
+      </script>
 
       <!-- risultati -->
       <div th:if="${results == null || results.isEmpty()}">

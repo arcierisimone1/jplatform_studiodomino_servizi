@@ -54,7 +54,7 @@
             </a>
           </div>
           <br>
-          <table class="table table-responsive-lg table-bordered table-striped mb-0">
+          <table id="elencoMessaggiWebTabella" class="table table-responsive-lg table-bordered table-striped mb-0">
             <thead>
             <tr>
               <th style="width:5%;">
@@ -75,18 +75,17 @@
                        class="inpt_c2" th:value="${row.id}">
               </td>
               <td>
-                <a> - </a>
+                <a th:href="@{/admin/crm/lead/messaggio/{id}(id=${row.id})}" th:text="${row.id}">-</a>
               </td>
               <td th:text="${row.data}">-</td>
               <td>
-                <a th:if="${row.utente != null}"
-                   th:href="@{/admin/crm/utenti/{id}(id=${row.utente.id})}"
-                   th:text="${(row.utente.nome != null ? row.utente.nome : '') + ' ' + (row.utente.cognome != null ? row.utente.cognome : '')}">
+                <a th:href="@{/admin/crm/lead/messaggio/{id}(id=${row.id})}"
+                   th:text="${row.nome + ' ' + row.cognome}">
                 </a>
               </td>
-              <td th:text="${row.utente != null ? row.utente.email : '-'}">-</td>
+              <td th:text="${row.email}">-</td>
               <td>
-                <a th:href="@{/admin/crm/lead/{id}(id=${row.id})}" title="Modifica">
+                <a th:href="@{/admin/crm/lead/messaggio/{id}(id=${row.id})}" title="Modifica">
                   <i class="fas fa-pencil-alt"></i>
                 </a>
                 &nbsp;&nbsp;
@@ -98,11 +97,30 @@
                 </a>
               </td>
             </tr>
-            <tr th:if="${#lists.isEmpty(elencoCommentiUtente)}">
+            <tr class="riga-vuota" th:if="${#lists.isEmpty(elencoCommentiUtente)}">
               <td colspan="6" class="text-center">Nessun messaggio trovato.</td>
             </tr>
             </tbody>
           </table>
+
+          <nav th:if="${totalePagine != null and totalePagine > 1}" class="mt-3">
+            <ul class="pagination justify-content-center mb-0">
+              <li class="page-item" th:classappend="${paginaCorrente == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/admin/crm/lead/filtro/e/{s}(s=${statoSelezionato},page=${paginaCorrente - 1})}">Precedente</a>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(0, totalePagine - 1)}"
+                  th:classappend="${i == paginaCorrente} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/admin/crm/lead/filtro/e/{s}(s=${statoSelezionato},page=${i})}"
+                   th:text="${i + 1}">1</a>
+              </li>
+              <li class="page-item" th:classappend="${paginaCorrente >= totalePagine - 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/admin/crm/lead/filtro/e/{s}(s=${statoSelezionato},page=${paginaCorrente + 1})}">Successivo</a>
+              </li>
+            </ul>
+          </nav>
 
         </div>
       </section>
@@ -141,9 +159,9 @@
     }
 
     // 3. FUNZIONE AJAX
-    function eseguiCancellazioneMessaggiAjax(ids) {
+        function eseguiCancellazioneMessaggiAjax(ids) {
     Promise.all(ids.map(id =>
-        fetch('/admin/crm/lead/' + id + '/delete', { method: 'POST' })
+        fetch('/admin/crm/lead/messaggio/' + id + '/delete', { method: 'POST' })
     )).then(() => location.reload());
 }
 }

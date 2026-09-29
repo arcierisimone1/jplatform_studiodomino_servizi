@@ -384,10 +384,57 @@ public class UtenteEsternoService {
     }
 
     /**
+     * Importa utenti da CSV semplificato (4 colonne: nome, cognome, email, telefono2)
+     * Equivalente a caricaCsvSemplificato()
+     */
+    public int importaCsvSemplificato(List<String[]> contatti, String idGruppo, String status, String newsletter, String sms) {
+        int totale = 0;
+
+        for (String[] row : contatti) {
+            try {
+                if (row.length < 4) {
+                    log.warn("Riga CSV semplificato incompleta, skip");
+                    continue;
+                }
+
+                String email = pulisci(row[2]);
+
+                if (verificaEmail(email)) {
+                    log.debug("Email già esistente: {}, skip", email);
+                    continue;
+                }
+
+                UtenteEsterno utente = UtenteEsterno.builder()
+                        .nome(pulisci(row[0]))
+                        .cognome(pulisci(row[1]))
+                        .email(email)
+                        .telefono2(pulisci(row[3]))
+                        .username(email)
+                        .password(passwordService.cryptPassword(email))
+                        .idGruppo("(" + idGruppo + ");")
+                        .status(status != null && !status.isBlank() ? status : "1")
+                        .l1(newsletter != null ? newsletter : "")
+                        .l2(sms != null ? sms : "")
+                        .datacreazione(DATE_FORMAT.format(new Date()))
+                        .build();
+
+                utenteRepository.save(utente);
+                totale++;
+
+            } catch (Exception e) {
+                log.error("Errore import CSV semplificato riga", e);
+            }
+        }
+
+        log.info("Importati {} utenti da CSV semplificato", totale);
+        return totale;
+    }
+
+    /**
      * Importa utenti da CSV esteso
      * Equivalente a caricaCsvEsteso()
      */
-    public int importaCsvEsteso(List<String[]> contatti, String idGruppo) {
+    public int importaCsvEsteso(List<String[]> contatti, String idGruppo, String status, String newsletter, String sms) {
         int totale = 0;
 
         for (String[] row : contatti) {
@@ -423,7 +470,9 @@ public class UtenteEsternoService {
                         .username(email)
                         .password(passwordService.cryptPassword(email))
                         .idGruppo("(" + idGruppo + ");")
-                        .status("1")
+                        .status(status != null && !status.isBlank() ? status : "1")
+                        .l1(newsletter != null ? newsletter : "")
+                        .l2(sms != null ? sms : "")
                         .datacreazione(DATE_FORMAT.format(new Date()))
                         .build();
 

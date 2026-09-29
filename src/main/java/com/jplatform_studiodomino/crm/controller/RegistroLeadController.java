@@ -1,5 +1,8 @@
 package com.jplatform_studiodomino.crm.controller;
 
+import com.jplatform_studiodomino.cms.entity.Commento;
+import com.jplatform_studiodomino.cms.repository.ContentRepository;
+import com.jplatform_studiodomino.cms.service.CommentoService;
 import com.jplatform_studiodomino.crm.entity.RegistroLead;
 import com.jplatform_studiodomino.crm.service.RegistroLeadService;
 import com.jplatform_studiodomino.shared.config.Configurazione;
@@ -18,6 +21,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controller admin per la gestione del Registro LEAD CRM.
@@ -41,6 +46,8 @@ public class RegistroLeadController {
 
     private final ConfigurazioneService configurazioneService;
     private final RegistroLeadService registroLeadService;
+    private final CommentoService commentoService;
+    private final ContentRepository contentRepository;
 
     private static final DateTimeFormatter DF  = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
     private static final DateTimeFormatter DTA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -65,37 +72,176 @@ public class RegistroLeadController {
     public String elencoCommentiUtente(
             @PathVariable(required = false) String direzione,
             @PathVariable(required = false) String stato,
+            @RequestParam(value = "page", defaultValue = "0") int page,
             HttpServletRequest request, Model model) {
 
         HttpSession session = request.getSession();
         Configurazione config = configurazioneService.getConfig(session);
         if (!config.isLogged()) return "redirect:/login";
 
-        String dirFinal = (direzione != null) ? direzione : "e";
-        String statoFinal = (stato != null) ? stato : "0";
+        // path "4" (bottone "Completati") -> messaggi già profilati in Lead (stato commento "2")
+        // qualsiasi altro valore, o assente (bottone "Da iniziare") -> messaggi da gestire (stato "0")
+        String statoCommento = "4".equals(stato) ? "2" : "0";
 
         try {
-            var leads = registroLeadService.findAllByStore(dirFinal, statoFinal, "commenti");
-            leads.forEach(lead -> {
-                if (lead.getIdutente() > 0) {
-                    lead.setUtente(registroLeadService.findUtenteBase(lead.getIdutente()));
-                }
-                if (lead.getIdamministratore() > 0) {
-                    lead.setAmministratore(registroLeadService.findAmministratoreById(
-                            String.valueOf(lead.getIdamministratore())));
-                }
-            });
+            var risultato = commentoService.findByTipologiaEStatoPaged("web", statoCommento, page);
 
-            model.addAttribute("elencoCommentiUtente",  leads);
-            model.addAttribute("statoLead",             STATO_LEAD);
-            model.addAttribute("statoSelezionato",      statoFinal);
-            model.addAttribute("direzioneSelezionata",  dirFinal);
-            model.addAttribute("config",                config);
+            model.addAttribute("elencoCommentiUtente", risultato.getContent());
+            model.addAttribute("paginaCorrente",       risultato.getNumber());
+            model.addAttribute("totalePagine",         risultato.getTotalPages());
+            model.addAttribute("statoSelezionato",     stato != null ? stato : "0");
+            model.addAttribute("config",               config);
         } catch (Exception e) {
-            log.error("Errore elencoCommentiUtente pulito", e);
+            log.error("Errore elencoCommentiUtente", e);
         }
 
         return ViewUtils.resolveProtectedTemplate("crm/sezioni/elencoCommentiUtente");
+    }
+
+    // =====================================================================
+    // DETTAGLIO MESSAGGIO WEB
+    // GET /admin/crm/lead/messaggio/{id}
+    // =====================================================================
+
+    @GetMapping("/messaggio/{id}")
+    public String apriMessaggio(@PathVariable Integer id, HttpServletRequest request, Model model) {
+        HttpSession session = request.getSession();
+        Configurazione config = configurazioneService.getConfig(session);
+        if (!config.isLogged()) return "redirect:/login";
+
+        try {
+            Commento messaggio = commentoService.findById(id).orElse(null);
+            if (messaggio == null) return "redirect:/admin/crm/lead";
+
+            if (messaggio.getIdoggetto() != null) {
+                try {
+                    int idoggetto = Integer.parseInt(messaggio.getIdoggetto().trim());
+                    contentRepository.findById(idoggetto).ifPresent(messaggio::setContenuto);
+                } catch (NumberFormatException ignored) {
+                    // idoggetto non numerico: nessun contenuto collegato da mostrare
+                }
+            }
+
+            model.addAttribute("messaggio", messaggio);
+            model.addAttribute("config", config);
+        } catch (Exception e) {
+            log.error("Errore apriMessaggio id={}", id, e);
+            return "redirect:/admin/crm/lead";
+        }
+
+        return ViewUtils.resolveProtectedTemplate("crm/contenuti/dettaglioMessaggioWeb");
+    }
+
+    // =====================================================================
+    // SALVA MESSAGGIO WEB
+    // POST /admin/crm/lead/messaggio/{id}/save
+    // =====================================================================
+
+    @PostMapping("/messaggio/{id}/save")
+    public String salvaMessaggio(
+            @PathVariable Integer id,
+            @ModelAttribute Commento form,
+            HttpServletRequest request, Model model) {
+
+        HttpSession session = request.getSession();
+        Configurazione config = configurazioneService.getConfig(session);
+        if (!config.isLogged()) return "redirect:/login";
+
+        try {
+            Commento messaggio = commentoService.findById(id).orElseThrow();
+            messaggio.setNome(form.getNome());
+            messaggio.setCognome(form.getCognome());
+            messaggio.setEmail(form.getEmail());
+            messaggio.setStato(form.getStato());
+            messaggio.setL1(form.getL1());
+            messaggio.setMessaggio(form.getMessaggio());
+            commentoService.save(messaggio);
+        } catch (Exception e) {
+            log.error("Errore salvaMessaggio id={}", id, e);
+        }
+
+        return "redirect:/admin/crm/lead/messaggio/" + id;
+    }
+
+    // =====================================================================
+    // ELIMINA MESSAGGIO WEB (AJAX)
+    // POST /admin/crm/lead/messaggio/{id}/delete
+    // =====================================================================
+
+    @PostMapping("/messaggio/{id}/delete")
+    @ResponseBody
+    public ResponseEntity<String> eliminaMessaggio(@PathVariable Integer id, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Configurazione config = configurazioneService.getConfig(session);
+        if (!config.isLogged()) return ResponseEntity.status(401).body("KO");
+
+        try {
+            commentoService.eliminaCommento(id);
+            return ResponseEntity.ok("OK");
+        } catch (Exception e) {
+            log.error("Errore eliminaMessaggio id={}", id, e);
+            return ResponseEntity.ok("KO");
+        }
+    }
+
+    // =====================================================================
+    // PROFILA LEAD PER UTENTE (crea un nuovo Lead a partire da un messaggio)
+    // GET /admin/crm/lead/new/commenti/{idCommento}
+    // =====================================================================
+
+    @GetMapping("/new/commenti/{idCommento}")
+    public String nuovoLeadDaCommento(
+            @PathVariable Integer idCommento,
+            HttpServletRequest request, Model model) {
+
+        HttpSession session = request.getSession();
+        Configurazione config = configurazioneService.getConfig(session);
+        if (!config.isLogged()) return "redirect:/login";
+
+        try {
+            Commento messaggio = commentoService.findById(idCommento).orElse(null);
+            if (messaggio == null) return "redirect:/admin/crm/lead";
+
+            RegistroLead registroLead = new RegistroLead();
+            registroLead.setId(-1L);
+            registroLead.setDirezione("e");
+            registroLead.setData(LocalDate.now().format(DTA));
+            registroLead.setOra(LocalTime.now().format(ORA));
+            registroLead.setIdamministratore(config.getAmministratore().getId());
+            registroLead.setAmministratore(config.getAmministratore());
+            registroLead.setIdleadstore(idCommento);
+            registroLead.setStore("commenti");
+            registroLead.setStato("0");
+            registroLead.setNotalead(messaggio.getMessaggio());
+
+            Integer idUtenteDaCommento = null;
+            String iduserStr = messaggio.getIduser();
+            if (iduserStr != null && !iduserStr.isBlank() && !"0".equals(iduserStr) && !"-1".equals(iduserStr)) {
+                try {
+                    idUtenteDaCommento = Integer.parseInt(iduserStr.trim());
+                } catch (NumberFormatException e) {
+                    log.warn("iduser non numerico sul commento id={}: {}", messaggio.getId(), iduserStr);
+                }
+            }
+
+            Integer idUtente = (idUtenteDaCommento != null && idUtenteDaCommento > 0)
+                    ? idUtenteDaCommento
+                    : registroLeadService.findIdUtenteByEmail(messaggio.getEmail());
+            registroLead.setIdutente(idUtente != null ? idUtente : 0);
+            if (idUtente != null && idUtente > 0) {
+                registroLead.setUtente(registroLeadService.findUtenteBase(idUtente));
+            }
+
+            model.addAttribute("areeInteresse", registroLeadService.findAreeInteresse());
+            model.addAttribute("statoLead",     STATO_LEAD);
+            model.addAttribute("registroLead",  registroLead);
+            model.addAttribute("config",        config);
+
+        } catch (Exception e) {
+            log.error("Errore nuovoLeadDaCommento idCommento={}", idCommento, e);
+        }
+
+        return ViewUtils.resolveProtectedTemplate("crm/contenuti/dettaglioRegistroLead");
     }
 
     // =====================================================================
@@ -108,6 +254,7 @@ public class RegistroLeadController {
     public String elencoRegistroLead(
             @PathVariable(required = false) String direzione,
             @PathVariable(required = false) String stato,
+            @RequestParam(value = "page", defaultValue = "0") int page,
             HttpServletRequest request, Model model) {
 
         HttpSession session = request.getSession();
@@ -118,8 +265,8 @@ public class RegistroLeadController {
         String statoFinal = (stato != null) ? stato : "0";
 
         try {
-            var leads = registroLeadService.findAll(dirFinal, statoFinal);
-            leads.forEach(lead -> {
+            var risultato = registroLeadService.findAllPaged(dirFinal, statoFinal, page);
+            risultato.getContent().forEach(lead -> {
                 if (lead.getIdutente() > 0) {
                     lead.setUtente(registroLeadService.findUtenteBase(lead.getIdutente()));
                 }
@@ -129,7 +276,9 @@ public class RegistroLeadController {
                 }
             });
 
-            model.addAttribute("elencoRegistroLead",    leads);
+            model.addAttribute("elencoRegistroLead",    risultato.getContent());
+            model.addAttribute("paginaCorrente",        risultato.getNumber());
+            model.addAttribute("totalePagine",          risultato.getTotalPages());
             model.addAttribute("statoLead",             STATO_LEAD);
             model.addAttribute("statoSelezionato",      statoFinal);
             model.addAttribute("direzioneSelezionata",  dirFinal);
@@ -150,6 +299,7 @@ public class RegistroLeadController {
     @GetMapping("/new/{store}")
     public String nuovoLead(
             @PathVariable String store,
+            @RequestParam(value = "idutente", required = false, defaultValue = "0") Integer idutente,
             HttpServletRequest request, Model model) {
 
         HttpSession session = request.getSession();
@@ -165,8 +315,12 @@ public class RegistroLeadController {
             registroLead.setIdamministratore(config.getAmministratore().getId());
             registroLead.setAmministratore(config.getAmministratore());
             registroLead.setIdleadstore(0);
-            registroLead.setIdutente(0);
+            registroLead.setIdutente(idutente);
             registroLead.setStore(store);
+
+            if (idutente != null && idutente > 0) {
+                registroLead.setUtente(registroLeadService.findUtenteBase(idutente));
+            }
 
             model.addAttribute("areeInteresse", registroLeadService.findAreeInteresse());
             model.addAttribute("statoLead",     STATO_LEAD);
@@ -212,6 +366,8 @@ public class RegistroLeadController {
             model.addAttribute("statoLead",    STATO_LEAD);
             model.addAttribute("registroLead", registroLead);
             model.addAttribute("config",       config);
+            model.addAttribute("accountsEmail",
+                    registroLeadService.findAccountsEmail(config.getAmministratore().getIdaccountemail()));
 
         } catch (Exception e) {
             log.error("Errore nuovoLeadUscita tipologia={}", tipologia, e);
@@ -238,6 +394,11 @@ public class RegistroLeadController {
         try {
             RegistroLead registroLead = registroLeadService.findById(id);
             arricchisciConStore(registroLead);
+            if (registroLead.getIdamministratore() > 0) {
+                registroLead.setAmministratore(
+                        registroLeadService.findAmministratoreById(
+                                String.valueOf(registroLead.getIdamministratore())));
+            }
 
             model.addAttribute("areeInteresse", registroLeadService.findAreeInteresse());
             model.addAttribute("statoLead",     STATO_LEAD);
@@ -273,6 +434,8 @@ public class RegistroLeadController {
             model.addAttribute("statoLead",    STATO_LEAD);
             model.addAttribute("registroLead", registroLead);
             model.addAttribute("config",       config);
+            model.addAttribute("accountsEmail",
+                    registroLeadService.findAccountsEmail(config.getAmministratore().getIdaccountemail()));
 
         } catch (Exception e) {
             log.error("Errore openRegistroLeadUscita id={} tipologia={}", id, tipologia, e);
@@ -280,6 +443,28 @@ public class RegistroLeadController {
 
         return ViewUtils.resolveProtectedTemplate(
                 "crm/contenuti/dettaglioRegistroLeadUscita" + tipologia);
+    }
+
+    // =====================================================================
+    // RICERCA OPERATORI (per assegnazione lead)
+    // GET /admin/crm/lead/operatori/search
+    // =====================================================================
+
+    @GetMapping("/operatori/search")
+    @ResponseBody
+    public List<Map<String, Object>> searchOperatori(
+            @RequestParam(value = "term", required = false) String term) {
+
+        if (term == null || term.trim().length() < 2) return List.of();
+
+        return registroLeadService.searchAmministratori(term).stream().map(u -> {
+            Map<String, Object> map = new java.util.LinkedHashMap<>();
+            map.put("id",      u.getId());
+            map.put("nome",    u.getNome());
+            map.put("cognome", u.getCognome());
+            map.put("email",   u.getEmail());
+            return map;
+        }).toList();
     }
 
     // =====================================================================
@@ -485,7 +670,6 @@ public class RegistroLeadController {
                 var commento = registroLeadService.findCommentoById(
                         (long) registroLead.getIdleadstore());
                 registroLead.setCommento(commento);
-                registroLead.setNotalead("Commento caricato");
 
             } else if ("emailstore".equals(registroLead.getStore())
                     && registroLead.getIdutente() > 0) {

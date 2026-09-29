@@ -1,6 +1,7 @@
 package com.jplatform_studiodomino.cms.repository;
 
 import com.jplatform_studiodomino.cms.entity.Commento;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -102,6 +103,22 @@ public interface CommentoRepository extends JpaRepository<Commento, Integer> {
             @Param("idoggetto") String idoggetto,
             @Param("tipologia") String tipologia
     );
+
+    /**
+     * Trova messaggi web per tipologia e stato (Gestione Messaggi WEB)
+     */
+    List<Commento> findByTipologiaAndStatoOrderByIdDesc(String tipologia, String stato);
+
+    /**
+     * Stessa query, paginata — usata dall'elenco "Gestione Messaggi WEB".
+     */
+    Page<Commento> findByTipologiaAndStatoOrderByIdDesc(
+            String tipologia, String stato, org.springframework.data.domain.Pageable pageable);
+
+    /**
+     * Conta messaggi per tipologia e stato (usato dal contatore "Messaggi ricevuti" in dashboard CRM)
+     */
+    long countByTipologiaAndStato(String tipologia, String stato);
 
     // ===== STATISTICHE =====
 

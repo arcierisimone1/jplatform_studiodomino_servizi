@@ -113,6 +113,122 @@
 
         </form>
       </section>
+
+      <!-- ═══ GESTIONE CONTATTI (IMPORT/RIMOZIONE CSV) ═══ -->
+      <section class="card card-primary mt-3">
+        <header class="card-header d-flex align-items-center justify-content-between" style="background-color: #206bc4; border-color: #206bc4; border-radius: 15px 15px 0 0;">
+          <div>
+            <h2 class="card-title" style="color: #fff; font-weight: bold;">Gestione contatti</h2>
+            <p class="card-subtitle mb-0" style="color: rgba(255, 255, 255, 0.8);">Operazioni comuni sui contatti del CRM</p>
+          </div>
+        </header>
+        <div class="card-body">
+
+          <div th:if="${csvOk}" class="alert alert-success" th:text="${csvOk}"></div>
+          <div th:if="${csvErrore}" class="alert alert-danger" th:text="${csvErrore}"></div>
+
+          <a th:href="@{/admin/crm/utenti/new}"
+             class="btn btn-primary rounded-pill w-100 mb-2">
+            <i class="fas fa-file-medical me-1"></i> Nuova anagrafica
+          </a>
+
+          <button type="button" class="btn btn-primary rounded-pill w-100 mb-2"
+                  data-bs-toggle="modal" data-bs-target="#modalImportaCsv">
+            <i class="fas fa-file-import me-1"></i> Importa anagrafica CSV
+          </button>
+
+          <button type="button" class="btn btn-primary rounded-pill w-100"
+                  data-bs-toggle="modal" data-bs-target="#modalRimuoviCsv">
+            <i class="fas fa-user-times me-1"></i> Cancella anagrafica CSV
+          </button>
+
+        </div>
+      </section>
+
+      <!-- Modal Importa CSV -->
+      <div class="modal fade" id="modalImportaCsv" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form th:action="@{/admin/crm/utenti/import-csv}" method="post" enctype="multipart/form-data">
+              <div class="modal-header">
+                <h5 class="modal-title">Importa contatti da CSV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+              </div>
+              <div class="modal-body">
+                <label class="form-label">Tipologia di importazione</label>
+                <select name="tipo" class="form-control mb-2">
+                  <option value="esteso">Tracciato 1 - Dati completi (14 colonne)</option>
+                  <option value="semplificato">Tracciato 2 - Semplificato (4 colonne: nome, cognome, email, telefono2)</option>
+                </select>
+
+                <label class="form-label">Gruppo associazione contatti</label>
+                <select name="idGruppo" class="form-control mb-2">
+                  <option value="">Nessun gruppo associato</option>
+                  <option th:each="g : ${config.gruppi}" th:value="${g.id}" th:text="${g.nome}"></option>
+                </select>
+
+                <div class="row g-2 mb-2">
+                  <div class="col-4">
+                    <label class="form-label">Stato contatto</label>
+                    <select name="status" class="form-control">
+                      <option value="1">Attivato/Da aggiornare</option>
+                      <option value="0">Non attivato</option>
+                    </select>
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label">Newsletter</label>
+                    <select name="newsletter" class="form-control">
+                      <option value="1">Attivato</option>
+                      <option value="0">Non attivato</option>
+                    </select>
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label">SMS</label>
+                    <select name="sms" class="form-control">
+                      <option value="1">Attivato</option>
+                      <option value="0">Non attivato</option>
+                    </select>
+                  </div>
+                </div>
+
+                <label class="form-label">File CSV da caricare</label>
+                <input type="file" name="file" accept=".csv" class="form-control" required>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-upload me-1"></i> Importa
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Rimuovi CSV -->
+      <div class="modal fade" id="modalRimuoviCsv" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form th:action="@{/admin/crm/utenti/rimuovi-csv}" method="post" enctype="multipart/form-data"
+                  onsubmit="return confirm('Confermi la rimozione dei contatti elencati nel file?');">
+              <div class="modal-header">
+                <h5 class="modal-title">Rimuovi contatti da CSV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+              </div>
+              <div class="modal-body">
+                <label class="form-label">File CSV (un'email per riga)</label>
+                <input type="file" name="file" accept=".csv" class="form-control" required>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="submit" class="btn btn-outline-danger">
+                  <i class="fas fa-trash-alt me-1"></i> Rimuovi
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- DESTRA: ELENCO -->
@@ -137,7 +253,7 @@
           </div>
 
           <div class="table-responsive">
-            <table class="table table-responsive-lg table-bordered table-striped mb-0">
+            <table id="elencoAnagraficaTabella" class="table table-responsive-lg table-bordered table-striped mb-0">
               <thead>
               <tr>
                 <th style="width:5%;">
@@ -152,7 +268,7 @@
               </thead>
 
               <tbody>
-              <tr th:if="${elencoAnagrafico == null || #lists.isEmpty(elencoAnagrafico)}">
+              <tr class="riga-vuota" th:if="${elencoAnagrafico == null || #lists.isEmpty(elencoAnagrafico)}">
                 <td colspan="4" class="text-center text-muted py-4">Nessun contatto. Esegui una ricerca.</td>
               </tr>
 

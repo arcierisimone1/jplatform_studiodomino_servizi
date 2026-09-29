@@ -35,6 +35,30 @@ $(document).ready(function(){
         });
     }
 
+
+        // Elenco anagrafica utenti (CRM)
+        if ($('#elencoAnagraficaTabella').length > 0
+            && $('#elencoAnagraficaTabella tbody tr').not('.riga-vuota').length > 0) {
+            initDataTable('#elencoAnagraficaTabella', {
+                order: [[1, 'asc']],
+                columnDefs: [
+                    { orderable: false, targets: [0, 3] }
+                ]
+            });
+        }
+
+
+        // Elenco anagrafica utenti (CRM)
+        if ($('#elencoAnagraficaTabella').length > 0
+            && $('#elencoAnagraficaTabella tbody tr').not('.riga-vuota').length > 0) {
+            initDataTable('#elencoAnagraficaTabella', {
+                order: [[1, 'asc']],
+                columnDefs: [
+                    { orderable: false, targets: [0, 3] }
+                ]
+            });
+        }
+
     // Tabelle nelle tab - inizializzate lazy al primo click
     document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(function(tabBtn) {
         tabBtn.addEventListener('shown.bs.tab', function(e) {
@@ -373,18 +397,30 @@ function initTinyMCE(selector) {
         selector: selector,
         language: 'it',
         language_url: '/manager/assets/js/plugins/tinymce/langs/it.js',
-        height: 350,
+        height: 500,
         menubar: false,
-        statusbar: false,
+        statusbar: true,
         content_style: 'body { font-family: Inter, sans-serif; font-size: 14px; }',
         content_css: ['/site01/assets/css/font-awesome-pro.css'],
         extended_valid_elements: 'i[class|style],span[class|style]',
         non_empty_elements: 'i,span',
+        font_family_formats:
+            'Inter=Inter,sans-serif;' +
+            'Arial=arial,helvetica,sans-serif;' +
+            'Georgia=georgia,palatino,serif;' +
+            'Tahoma=tahoma,arial,helvetica,sans-serif;' +
+            'Times New Roman=times new roman,times,serif;' +
+            'Verdana=verdana,geneva,sans-serif',
+        fontsize_formats: '10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 48px',
         plugins: 'advlist autolink lists link image charmap preview anchor ' +
-                        'searchreplace code fullscreen table wordcount pastetext',
-               toolbar: 'undo redo | formatselect | bold italic underline | ' +
-                        'forecolor backcolor | alignleft aligncenter alignright alignjustify | ' +
-                        'bullist numlist outdent indent | link image table | pastetext removeformat | code fullscreen',
+                 'searchreplace code fullscreen table wordcount pastetext ' +
+                 'media visualblocks help emoticons',
+        toolbar: 'undo redo | blocks fontfamily fontsize | ' +
+                 'bold italic underline strikethrough | forecolor backcolor removeformat | ' +
+                 'alignleft aligncenter alignright alignjustify | ' +
+                 'bullist numlist outdent indent | ' +
+                 'link image media table charmap | ' +
+                 'pastetext code fullscreen preview | help',
         automatic_uploads: true,
         images_upload_url: '/admin/filemanager/upload-tinymce',
         image_advtab: true,

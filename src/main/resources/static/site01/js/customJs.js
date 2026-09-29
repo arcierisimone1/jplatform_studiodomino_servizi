@@ -298,7 +298,7 @@
             var cleanBtn = input.parentElement.querySelector('.clean-input');
     
             if (!cleanBtn) {
-              input.insertAdjacentHTML('afterend', "\n          <button type=\"button\" class=\"clean-input\" aria-label=\"Elimina testo di ricerca\">\n            <svg class=\"icon\">\n              <use xlink:href=\"../assets/bootstrap-italia/dist/svg/sprites.svg#it-close\"></use>\n            </svg>\n          </button>\n          ");
+             input.insertAdjacentHTML('afterend', "\n          <button type=\"button\" tabindex=\"-1\" class=\"clean-input\" aria-label=\"Elimina testo di ricerca\">\n            <svg class=\"icon\">\n              <use xlink:href=\"../assets/bootstrap-italia/dist/svg/sprites.svg#it-close\"></use>\n            </svg>\n          </button>\n          ");
               var clean = input.parentElement.querySelector('.clean-input');
               var label = input.parentElement.querySelector('.cmp-input__label');
               clean.addEventListener('click', function () {
