@@ -1,6 +1,9 @@
 package com.jplatform_studiodomino.shared.service;
 
+import com.jplatform_studiodomino.cms.entity.Allegato;
+import com.jplatform_studiodomino.cms.service.AllegatoService;
 import com.jplatform_studiodomino.shared.entity.Folder;
+import com.jplatform_studiodomino.shared.entity.Images;
 import com.jplatform_studiodomino.shared.repository.FolderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,8 @@ import java.util.stream.Collectors;
 public class FolderService {
 
     private final FolderRepository folderRepository;
+    private final ImagesService imagesService;
+    private final AllegatoService allegatoService;
 
     /**
      * Trova folder per ID
@@ -162,21 +167,33 @@ public class FolderService {
     }
 
     /**
-     * Elimina folder ricorsivamente (con tutti i subfolder)
+     * Elimina folder ricorsivamente: subfolder, immagini e allegati contenuti, poi il folder stesso.
      */
     @Transactional
-    public void deleteFolderRecursive(Integer id) {
+    public void deleteFolderRecursive(Integer id) throws java.io.IOException {
         Optional<Folder> folder = folderRepository.findById(id);
         if (folder.isPresent()) {
-            // Elimina tutti i subfolder
+            // 1. Elimina ricorsivamente tutti i subfolder (e il loro contenuto)
             List<Folder> subfolders = folderRepository.findByIdfolderOrderByNomeAsc(id.toString());
             for (Folder subfolder : subfolders) {
                 deleteFolderRecursive(subfolder.getId());
             }
 
-            // Elimina il folder
+            // 2. Elimina tutte le immagini contenute in questo folder (file fisico + record DB)
+            List<Images> immagini = imagesService.findByFolder(id.toString());
+            for (Images img : immagini) {
+                imagesService.delete(img.getId());
+            }
+
+            // 3. Elimina tutti gli allegati contenuti in questo folder
+            List<Allegato> allegati = allegatoService.findByFolder(id);
+            for (Allegato all : allegati) {
+                allegatoService.deleteAllegato(all.getId());
+            }
+
+            // 4. Elimina il folder stesso
             folderRepository.deleteById(id);
-            log.info("Folder eliminato ricorsivamente: {}", id);
+            log.info("Folder eliminato ricorsivamente (con immagini/allegati): {}", id);
         }
     }
 

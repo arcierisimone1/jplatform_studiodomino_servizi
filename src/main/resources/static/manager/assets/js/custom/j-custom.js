@@ -323,7 +323,7 @@ function cancellaSezioniSelezionate() {
             $.ajax({
                 type: 'POST',
                 url: '/admin/sezioni/deleteMultiplo',
-                data: { delSectID: ids },
+                data: { delSezioniID: ids },
                 traditional: true,
                 success: function() {
                     showToast('Completato', 'Sezioni eliminate.');
@@ -750,27 +750,62 @@ function cancellaSelezionati() {
         return;
     }
     confirmAction('Eliminare i ' + checked.length + ' elementi selezionati?', function() {
-        var promises = [];
-        checked.forEach(function(cb) {
+        var items = Array.from(checked).map(function(cb) {
             var container = cb.closest('[data-id]');
-            var tipo = container.getAttribute('data-tipo');
-            var id   = container.getAttribute('data-id');
-            var url  = '';
-            if (tipo === 'folder')   url = '/admin/filemanager/folder/' + id + '/delete';
-            if (tipo === 'immagine') url = '/admin/filemanager/images/' + id + '/delete';
-            if (tipo === 'allegato') url = '/admin/filemanager/files/'  + id + '/delete';
-            promises.push(fetch(url, { method: 'POST' }));
+            return {
+                id: container.getAttribute('data-id'),
+                tipo: container.getAttribute('data-tipo')
+            };
         });
-        Promise.all(promises).then(function() { location.reload(); });
+
+        var promises = items.map(function(item) {
+            var url = '';
+            if (item.tipo === 'folder') url = '/admin/filemanager/folder/' + item.id + '/delete';
+            if (item.tipo === 'image')  url = '/admin/filemanager/images/' + item.id + '/delete';
+            if (item.tipo === 'file')   url = '/admin/filemanager/files/'  + item.id + '/delete';
+            return fetch(url, { method: 'POST' })
+                .then(function(response) {
+                    return response.text().then(function(body) {
+                        return { item: item, ok: response.ok, body: body };
+                    });
+                })
+                .catch(function() {
+                    return { item: item, ok: false, body: 'Errore di rete' };
+                });
+        });
+
+        Promise.all(promises).then(function(results) {
+            var okCount = results.filter(function(r) { return r.ok; }).length;
+            var errors = results.filter(function(r) { return !r.ok; });
+
+            if (errors.length === 0) {
+                showToast('Completato', okCount + ' elementi eliminati.');
+            } else if (okCount === 0) {
+                showToast('Errore', 'Nessun elemento eliminato: ' + errors[0].body, 'danger');
+            } else {
+                showToast('Attenzione', okCount + ' eliminati, ' + errors.length + ' falliti: ' + errors[0].body, 'danger');
+            }
+            setTimeout(function() { location.reload(); }, errors.length ? 2000 : 800);
+        });
     });
 }
 
 function cancellaFolder(id) {
     confirmAction('Eliminare la cartella?', function() {
         fetch('/admin/filemanager/folder/' + id + '/delete', { method: 'POST' })
-            .then(function() {
+            .then(function(response) {
+                return response.text().then(function(body) { return { ok: response.ok, body: body }; });
+            })
+            .then(function(result) {
+                if (!result.ok) {
+                    showToast('Errore', 'Impossibile eliminare la cartella: ' + result.body, 'danger');
+                    return;
+                }
                 var el = document.querySelector('[data-tipo="folder"][data-id="' + id + '"]');
                 if (el) el.remove();
+            })
+            .catch(function() {
+                showToast('Errore', 'Errore di rete durante la cancellazione.', 'danger');
             });
     });
 }
@@ -778,9 +813,19 @@ function cancellaFolder(id) {
 function cancellaImmagine(id) {
     confirmAction("Eliminare l'immagine?", function() {
         fetch('/admin/filemanager/images/' + id + '/delete', { method: 'POST' })
-            .then(function() {
+            .then(function(response) {
+                return response.text().then(function(body) { return { ok: response.ok, body: body }; });
+            })
+            .then(function(result) {
+                if (!result.ok) {
+                    showToast('Errore', "Impossibile eliminare l'immagine: " + result.body, 'danger');
+                    return;
+                }
                 var el = document.querySelector('[data-tipo="immagine"][data-id="' + id + '"]');
                 if (el) el.remove();
+            })
+            .catch(function() {
+                showToast('Errore', 'Errore di rete durante la cancellazione.', 'danger');
             });
     });
 }
@@ -788,9 +833,19 @@ function cancellaImmagine(id) {
 function cancellaAllegato(id) {
     confirmAction('Eliminare il documento?', function() {
         fetch('/admin/filemanager/files/' + id + '/delete', { method: 'POST' })
-            .then(function() {
+            .then(function(response) {
+                return response.text().then(function(body) { return { ok: response.ok, body: body }; });
+            })
+            .then(function(result) {
+                if (!result.ok) {
+                    showToast('Errore', 'Impossibile eliminare il documento: ' + result.body, 'danger');
+                    return;
+                }
                 var el = document.querySelector('[data-tipo="allegato"][data-id="' + id + '"]');
                 if (el) el.remove();
+            })
+            .catch(function() {
+                showToast('Errore', 'Errore di rete durante la cancellazione.', 'danger');
             });
     });
 }

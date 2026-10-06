@@ -17,12 +17,12 @@
                                 <span th:if="${breadcrumb.items == null or breadcrumb.items.isEmpty() or !#strings.equalsIgnoreCase(breadcrumb.items[0].titolo, 'Home')}">
                                     <a th:href="@{/front}">Home</a>
                                 </span>
-                                <span class="dvdr" th:if="${breadcrumb.items != null and !breadcrumb.items.isEmpty() and !#strings.equalsIgnoreCase(breadcrumb.items[0].titolo, 'Home')}"><i class="fas fa-chevron-right fs-12"></i></span>
+                                <span class="dvdr" th:if="${breadcrumb.items != null and !breadcrumb.items.isEmpty() and !#strings.equalsIgnoreCase(breadcrumb.items[0].titolo, 'Home')}"><span class="dvdr-arrow">&rsaquo;</span></span>
                                 <th:block th:each="item, iterStat : ${breadcrumb.items}">
-                                    <span class="dvdr" th:unless="${iterStat.first}"><i class="fas fa-chevron-right fs-12"></i></span>
+                                    <span class="dvdr" th:unless="${iterStat.first}"><span class="dvdr-arrow">&rsaquo;</span></span>
                                     <span><a th:href="${item.url != null and item.url.startsWith('/')} ? ${item.url} : '/' + ${item.url}" th:text="${item.titolo}">Sezione</a></span>
                                 </th:block>
-                                <span class="dvdr"><i class="fas fa-chevron-right fs-12"></i></span>
+                                <span class="dvdr"><span class="dvdr-arrow">&rsaquo;</span></span>
                                 <i th:text="${breadcrumb.itemAttuale}">Pagina</i>
                             </div>
                         </div>
@@ -47,12 +47,12 @@
                                 <span th:if="${breadcrumb.items == null or breadcrumb.items.isEmpty() or !#strings.equalsIgnoreCase(breadcrumb.items[0].titolo, 'Home')}">
                                     <a th:href="@{/front}">Home</a>
                                 </span>
-                                <span class="dvdr" th:if="${breadcrumb.items != null and !breadcrumb.items.isEmpty() and !#strings.equalsIgnoreCase(breadcrumb.items[0].titolo, 'Home')}"><i class="fas fa-chevron-right fs-12"></i></span>
+                                <span class="dvdr" th:if="${breadcrumb.items != null and !breadcrumb.items.isEmpty() and !#strings.equalsIgnoreCase(breadcrumb.items[0].titolo, 'Home')}"><span class="dvdr-arrow">&rsaquo;</span></span>
                                 <th:block th:each="item, iterStat : ${breadcrumb.items}">
-                                    <span class="dvdr" th:unless="${iterStat.first}"><i class="fas fa-chevron-right fs-12"></i></span>
+                                    <span class="dvdr" th:unless="${iterStat.first}"><span class="dvdr-arrow">&rsaquo;</span></span>
                                     <span><a th:href="${item.url != null and item.url.startsWith('/')} ? ${item.url} : '/' + ${item.url}" th:text="${item.titolo}">Sezione</a></span>
                                 </th:block>
-                                <span class="dvdr"><i class="fas fa-chevron-right fs-12"></i></span>
+                                <span class="dvdr"><span class="dvdr-arrow">&rsaquo;</span></span>
                                 <i th:text="${breadcrumb.itemAttuale}">Pagina</i>
                             </div>
                         </div>

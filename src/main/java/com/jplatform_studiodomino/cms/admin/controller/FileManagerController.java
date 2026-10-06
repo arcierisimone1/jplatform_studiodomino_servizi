@@ -759,7 +759,7 @@ public class FileManagerController {
         if (!config.isLogged()) return ResponseEntity.status(401).body("KO");
 
         try {
-            folderService.deleteFolder(id);
+            folderService.deleteFolderRecursive(id);
             return ResponseEntity.ok("OK");
         } catch (Exception e) {
             log.error("Errore eliminazione folder id={}", id, e);

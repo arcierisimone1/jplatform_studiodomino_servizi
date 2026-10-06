@@ -159,12 +159,11 @@
     }
 
     // 3. FUNZIONE AJAX
-        function eseguiCancellazioneMessaggiAjax(ids) {
-    Promise.all(ids.map(id =>
-        fetch('/admin/crm/lead/messaggio/' + id + '/delete', { method: 'POST' })
-    )).then(() => location.reload());
-}
-}
+    function eseguiCancellazioneMessaggiAjax(ids) {
+        Promise.all(ids.map(id =>
+            fetch('/admin/crm/lead/messaggio/' + id + '/delete', { method: 'POST' })
+        )).then(() => location.reload());
+    }
 
     // 4. GESTIONE SELEZIONA TUTTI
     document.addEventListener('change', function(e) {

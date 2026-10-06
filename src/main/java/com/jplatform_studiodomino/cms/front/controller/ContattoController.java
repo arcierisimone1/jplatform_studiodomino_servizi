@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Riceve l'invio del form "Richiedi Informazioni" (fragment
  * site01/fragments/jspUser/contatti2) e salva un Messaggio Web
@@ -49,6 +52,15 @@ public class ContattoController {
 
         String redirect = (returnUrl != null && !returnUrl.isBlank()) ? returnUrl : DEFAULT_RETURN;
 
+        // dati scritti dall'utente: li rimandiamo indietro se qualcosa non va
+        Map<String, String> datiForm = new LinkedHashMap<>();
+        datiForm.put("nome", nome);
+        datiForm.put("cognome", cognome);
+        datiForm.put("email", email);
+        datiForm.put("telefono", telefono);
+        datiForm.put("messaggioInformativo", messaggioInformativo);
+        datiForm.put("terms_conditions", terms_conditions);
+
         try {
             // ===== VERIFICA CAPTCHA =====
             Object sessionSum = session.getAttribute("captchaSum");
@@ -63,14 +75,17 @@ public class ContattoController {
             if (!captchaOk) {
                 redirectAttributes.addFlashAttribute("contattoErrore",
                         "Codice di controllo errato, riprova.");
-                return "redirect:" + redirect;
+                redirectAttributes.addFlashAttribute("captchaErrore", true);
+                redirectAttributes.addFlashAttribute("contattoForm", datiForm);
+                return "redirect:" + redirect + "#informazioniGeneriche";
             }
 
             // ===== VERIFICA PRIVACY =====
             if (terms_conditions == null || terms_conditions.isBlank()) {
                 redirectAttributes.addFlashAttribute("contattoErrore",
                         "Devi accettare l'informativa privacy per inviare la richiesta.");
-                return "redirect:" + redirect;
+                redirectAttributes.addFlashAttribute("contattoForm", datiForm);
+                return "redirect:" + redirect + "#informazioniGeneriche";
             }
 
             Configurazione config = configurazioneService.getOrCreateConfiguration(request);
@@ -132,6 +147,7 @@ public class ContattoController {
             log.error("Errore invio form contatti", e);
             redirectAttributes.addFlashAttribute("contattoErrore",
                     "Errore durante l'invio della richiesta, riprova più tardi.");
+            redirectAttributes.addFlashAttribute("contattoForm", datiForm);
         }
 
         return "redirect:" + redirect;
