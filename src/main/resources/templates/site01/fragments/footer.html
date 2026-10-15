@@ -177,7 +177,19 @@
                         </div>
                         <div class="col-lg-5 col-md-12">
                             <div class="it-copyright-menu text-lg-end">
-                                <a class="border-line" th:href="@{/login}">Redazione</a> | <a class="border-line" th:href="@{/front/35/Privacy_Policy}">Privacy policy</a>
+                                <a class="border-line" th:href="@{/login}">Redazione</a> | <a class="border-line" th:href="@{/front/35/Privacy_Policy}">Privacy policy</a> | <a class="border-line" href="#" id="sdCookieReset">Ripristina cookie</a>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        var r = document.getElementById('sdCookieReset');
+                                        if (!r) return;
+                                        r.addEventListener('click', function (e) {
+                                            e.preventDefault();
+                                            document.cookie = 'sd_cookie_ok=; max-age=0; path=/; SameSite=Lax';
+                                            var b = document.getElementById('sdCookie');
+                                            if (b) b.classList.add('sd-cookie-visible');
+                                        });
+                                    });
+                                </script>
                             </div>
 
                         </div>

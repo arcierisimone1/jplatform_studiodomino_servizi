@@ -87,26 +87,28 @@
 
   <script th:inline="javascript">
     function cancellaTemplateRisposta(id) {
-        if (!confirm('Sei sicuro di voler eliminare questa risposta standard?')) return;
+    confirmAction('Sei sicuro di voler eliminare questa risposta standard?', function() {
         fetch('/admin/crm/risposte/' + id + '/delete', { method: 'POST' })
             .then(r => r.text())
             .then(res => {
                 if (res === 'OK') location.reload();
                 else alert('Errore durante la cancellazione.');
             });
-    }
+    });
+}
 
-    function cancellaTemplateRispostaMultiplo() {
-        const ids = Array.from(document.querySelectorAll('.riga-sel:checked')).map(cb => cb.value);
-        if (ids.length === 0) {
-            alert('Seleziona almeno una risposta standard.');
-            return;
-        }
-        if (!confirm('Eliminare le ' + ids.length + ' risposte selezionate?')) return;
+function cancellaTemplateRispostaMultiplo() {
+    const ids = Array.from(document.querySelectorAll('.riga-sel:checked')).map(cb => cb.value);
+    if (ids.length === 0) {
+        alert('Seleziona almeno una risposta standard.');
+        return;
+    }
+    confirmAction('Eliminare le ' + ids.length + ' risposte selezionate?', function() {
         Promise.all(ids.map(id =>
             fetch('/admin/crm/risposte/' + id + '/delete', { method: 'POST' })
         )).then(() => location.reload());
-    }
+    });
+}
 
     document.getElementById('selAllTemplateRisposta').addEventListener('change', function() {
         document.querySelectorAll('.riga-sel').forEach(cb => cb.checked = this.checked);

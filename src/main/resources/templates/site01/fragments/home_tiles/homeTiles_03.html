@@ -1,105 +1,104 @@
 <th:block xmlns:th="http://www.thymeleaf.org" th:fragment="homeTiles_03">
-    <section class="it-categories-area pt-130 pb-95">
+
+    <style>
+        .it-cat-tile {
+            display: block;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            line-height: 0;
+            transition: box-shadow .25s ease, transform .25s ease;
+        }
+        .it-cat-tile:hover {
+            box-shadow: 0 14px 30px rgba(18, 102, 241, 0.18), 0 2px 8px rgba(1,6,20,0.06);
+            transform: translateY(-4px) scale(1.02);
+        }
+        .it-cat-tile:hover img {
+            transform: scale(1.05);
+        }
+        .it-cat-tile::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -75%;
+            width: 45%;
+            height: 100%;
+            background: linear-gradient(115deg, transparent, rgba(255,255,255,0.45), transparent);
+            transform: skewX(-20deg);
+            transition: left .65s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .it-cat-tile:hover::after { left: 130%; }
+        .it-cat-tile img {
+    display: block;
+    width: 100%;
+    max-width: 100% !important;
+    height: auto;
+    transition: transform .4s ease;
+}
+    </style>
+
+    <section class="it-categories-area pt-80 pb-95">
         <div class="container">
-            <div class="row align-items-center">
+            <div class="row">
                 <div class="col-12">
-                    <div class="it-categories-section-title-box text-center mb-65">
-                        <h3 class="it-section-title">Offerta formativa</h3>
-                        <span class="it-section-subtitle">Acquisisci le competenze giuste per te!</span>
+                    <div class="it-categories-section-title-box text-center mb-50">
+                        <span class="it-section-subtitle">Servizi rapidi</span>
+                        <h4 class="it-section-title">Hai bisogno di <span class="z-index-1">assistenza?</span></h4>
                     </div>
                 </div>
             </div>
-            <div class="row row-cols-xxl-4 row-cols-xl-3 row-cols-lg-3 row-cols-md-2 row-cols-sm-2 row-cols-1 gx-35">
+
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 gx-25 gy-25">
 
                 <div class="col">
-                    <div class="it-categories-item item-style-1 text-center">
-                        <a th:href="@{/front/335/Percorsi_formativi}" class="d-block">
-                            <span><i class="fas fa-chalkboard-teacher font-72"></i></span>
-                            <h6 class="mb-0">Corsi di Formazione</h6>
+                    <div class="text-center">
+                        <a th:href="@{/front/319/Assistenza_hardware_e_software}" class="d-block it-cat-tile">
+                            <img th:src="@{/site01/images/assistenza_tecnica.png}" alt="Assistenza tecnica" class="img-fluid" style="max-width:180px;" />
                         </a>
                     </div>
                 </div>
 
                 <div class="col">
-                    <div class="it-categories-item item-style-2 text-center">
-                        <a th:href="@{/front/337/Alta_formazione}" class="d-block">
-                            <span><i class="fas fa-user-tie font-72"></i></span>
-                            <h6 class="mb-0">Alta Formazione</h6>
+                    <div class="text-center">
+                        <a href="#" class="d-block it-cat-tile">
+                            <img th:src="@{/site01/images/media_manager.png}" alt="Media Manager" class="img-fluid" style="max-width:180px;" />
                         </a>
                     </div>
                 </div>
 
                 <div class="col">
-                    <div class="it-categories-item item-style-3 text-center">
-                        <a th:href="@{/front/336/Qualifica_Professionale}" class="d-block">
-                            <span><i class="fas fa-people-arrows font-72"></i></span>
-                            <h6 class="mb-0">Qualificazioni Professionali</h6>
+                    <div class="text-center">
+                        <a th:href="@{/front/318/Lo_sviluppo_software}" class="d-block it-cat-tile">
+                            <img th:src="@{/site01/images/sviluppo_software.png}" alt="Sviluppo software" class="img-fluid" style="max-width:180px;" />
                         </a>
                     </div>
                 </div>
 
                 <div class="col">
-                    <div class="it-categories-item item-style-4 text-center">
-                        <a th:href="@{/front/339/Language_School}" class="d-block">
-                            <span><i class="fas fa-language font-72"></i></span>
-                            <h6 class="mb-0">Formazione Linguistica</h6>
+                    <div class="text-center">
+                        <a th:href="@{/front/718/Firma_Digitale}" class="d-block it-cat-tile">
+                            <img th:src="@{/site01/images/firma_digitale.png}" alt="Firma digitale" class="img-fluid" style="max-width:180px;" />
                         </a>
                     </div>
                 </div>
 
                 <div class="col">
-                    <div class="it-categories-item item-style-5 text-center">
-                        <a th:href="@{/front/338/Mondo_Scuola}" class="d-block">
-                            <span><i class="fas fa-users font-72"></i></span>
-                            <h6 class="mb-0">Mondo Scuola</h6>
-                        </a>
-                    </div>
-                </div>
-
-                <!--div class="col">
-                    <div class="it-categories-item item-style-6 text-center">
-                        <a th:href="@{/front/341/Universita}" class="d-block">
-                            <span><i class="fas fa-graduation-cap font-72"></i></span>
-                            <h6 class="mb-0">Università</h6>
-                        </a>
-                    </div>
-                </div-->
-
-                <div class="col">
-                    <div class="it-categories-item item-style-7 text-center">
-                        <a th:href="@{/front/356/Formazione_Aziendale}" class="d-block">
-                            <span><i class="fas fa-address-card font-72"></i></span>
-                            <h6 class="mb-0">Formazione Aziendale</h6>
+                    <div class="text-center">
+                        <a th:href="@{/front/719/SPID_-_Sistema_Pubblico_di_Identità_Digitale}" class="d-block it-cat-tile">
+                            <img th:src="@{/site01/images/spid.png}" alt="SPID" class="img-fluid" style="max-width:180px;" />
                         </a>
                     </div>
                 </div>
 
                 <div class="col">
-                    <div class="it-categories-item item-style-8 text-center">
-                        <a th:href="@{/front/693/Rafforzamento_Scolastico_-_DOPOSCUOLA_}" class="d-block">
-                            <span><i class="fas fa-child font-72"></i></span>
-                            <h6 class="mb-0">Doposcuola</h6>
+                    <div class="text-center">
+                        <a th:href="@{/front/393/Aruba_PEC}" class="d-block it-cat-tile">
+                            <img th:src="@{/site01/images/pec.png}" alt="PEC" class="img-fluid" style="max-width:180px;" />
                         </a>
                     </div>
                 </div>
-
-                <div class="col">
-                    <div class="it-categories-item item-style-1 text-center">
-                        <a th:href="@{/front/325/Eipass_Center}" class="d-block">
-                            <span><i class="fas fa-certificate font-72"></i></span>
-                            <h6 class="mb-0">Certificazioni EIPASS</h6>
-                        </a>
-                    </div>
-                </div>
-
-                <!--div class="col">
-                    <div class="it-categories-item item-style-8 text-center">
-                        <a th:href="@{/front/342/Post_Laurea_Universitari}" class="d-block">
-                            <span><i class="fas fa-id-card-alt font-72"></i></span>
-                            <h6 class="mb-0">Post Lauream Universitari</h6>
-                        </a>
-                    </div>
-                </div-->
 
             </div>
         </div>
