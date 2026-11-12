@@ -52,9 +52,17 @@ public class SeoInterceptor implements HandlerInterceptor {
                     seo.prop(section, "riassunto"),
                     seo.prop(config, "sito.libero2"));
 
-            String rawImage = seo.firstNonBlank(
-                    seo.prop(post, "immagine"),
-                    seo.prop(section, "immagine"));
+            String logoPath = seo.firstNonBlank(
+                    seo.prop(post, "logo"),
+                    seo.prop(section, "logo"));
+
+            String imagesRepositoryWeb = seo.prop(config, "imagesRepositoryWeb");
+
+            String rawImage = (logoPath != null
+                    && !"nofoto.jpg".equals(logoPath)
+                    && imagesRepositoryWeb != null && !imagesRepositoryWeb.isBlank())
+                    ? imagesRepositoryWeb + logoPath
+                    : null;
 
             String canonical = seo.firstNonBlank(
                     seo.asText(model.get("currentUrl")),

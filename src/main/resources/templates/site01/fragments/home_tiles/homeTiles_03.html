@@ -30,13 +30,16 @@
             z-index: 1;
         }
         .it-cat-tile:hover::after { left: 130%; }
+                .it-cat-tile {
+            max-width: 180px;
+            margin: 0 auto;
+        }
         .it-cat-tile img {
-    display: block;
-    width: 100%;
-    max-width: 100% !important;
-    height: auto;
-    transition: transform .4s ease;
-}
+            display: block;
+            width: 100%;
+            height: auto;
+            transition: transform .4s ease;
+        }
     </style>
 
     <section class="it-categories-area pt-80 pb-95">
@@ -50,52 +53,52 @@
                 </div>
             </div>
 
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 gx-25 gy-25">
+            <div class="row justify-content-center">
 
-                <div class="col">
+                <div class="col-6 col-md-4 col-lg-2 mb-4">
                     <div class="text-center">
                         <a th:href="@{/front/319/Assistenza_hardware_e_software}" class="d-block it-cat-tile">
-                            <img th:src="@{/site01/images/assistenza_tecnica.png}" alt="Assistenza tecnica" class="img-fluid" style="max-width:180px;" />
+                            <img th:src="@{/site01/images/assistenza_tecnica.png}" alt="Assistenza tecnica"/>
                         </a>
                     </div>
                 </div>
 
-                <div class="col">
+                <div class="col-6 col-md-4 col-lg-2 mb-4">
                     <div class="text-center">
                         <a href="#" class="d-block it-cat-tile">
-                            <img th:src="@{/site01/images/media_manager.png}" alt="Media Manager" class="img-fluid" style="max-width:180px;" />
+                            <img th:src="@{/site01/images/media_manager.png}" alt="Media Manager"/>
                         </a>
                     </div>
                 </div>
 
-                <div class="col">
+                <div class="col-6 col-md-4 col-lg-2 mb-4">
                     <div class="text-center">
                         <a th:href="@{/front/318/Lo_sviluppo_software}" class="d-block it-cat-tile">
-                            <img th:src="@{/site01/images/sviluppo_software.png}" alt="Sviluppo software" class="img-fluid" style="max-width:180px;" />
+                            <img th:src="@{/site01/images/sviluppo_software.png}" alt="Sviluppo software"/>
                         </a>
                     </div>
                 </div>
 
-                <div class="col">
+                <div class="col-6 col-md-4 col-lg-2 mb-4">
                     <div class="text-center">
                         <a th:href="@{/front/718/Firma_Digitale}" class="d-block it-cat-tile">
-                            <img th:src="@{/site01/images/firma_digitale.png}" alt="Firma digitale" class="img-fluid" style="max-width:180px;" />
+                            <img th:src="@{/site01/images/firma_digitale.png}" alt="Firma digitale"/>
                         </a>
                     </div>
                 </div>
 
-                <div class="col">
+                <div class="col-6 col-md-4 col-lg-2 mb-4">
                     <div class="text-center">
                         <a th:href="@{/front/719/SPID_-_Sistema_Pubblico_di_Identità_Digitale}" class="d-block it-cat-tile">
-                            <img th:src="@{/site01/images/spid.png}" alt="SPID" class="img-fluid" style="max-width:180px;" />
+                            <img th:src="@{/site01/images/spid.png}" alt="SPID"/>
                         </a>
                     </div>
                 </div>
 
-                <div class="col">
+                <div class="col-6 col-md-4 col-lg-2 mb-4">
                     <div class="text-center">
                         <a th:href="@{/front/393/Aruba_PEC}" class="d-block it-cat-tile">
-                            <img th:src="@{/site01/images/pec.png}" alt="PEC" class="img-fluid" style="max-width:180px;" />
+                            <img th:src="@{/site01/images/pec.png}" alt="PEC"/>
                         </a>
                     </div>
                 </div>

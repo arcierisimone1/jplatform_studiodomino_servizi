@@ -301,11 +301,6 @@ public class FrontController {
             model.addAttribute("section", section);
             model.addAttribute("contents", section.getContenuti());
 
-            // ===== TEAM AZIENDALE (solo per la sezione "L'azienda", id 312) =====
-            // Mostra gli Amministratori del gestionale come "il nostro team",
-            // riusando gli stessi dati/foto già gestiti in /admin/amministratori.
-            // NB: id diverso da quello del sito Formazione (dove "L'azienda" è 313
-            // dopo la fusione con "Sede") perché qui è un database CMS separato.
             if (section.getId() != null && section.getId() == 312) {
                 try {
                     List<Utente> team = utenteService.getAllUtenti().stream()
